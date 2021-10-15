@@ -23,7 +23,8 @@ This node check if Circle is running on the local machine.
 
 
 ## Circle Authorize Node
-This node Authorizes use of the CircleService.
+This node Authorizes use of the Circle Service.
+
 ![ScreenShot](./circleauthorize.png)
 
 
@@ -42,7 +43,8 @@ This node Authorizes use of the CircleService.
 <h2>
  
 ## Circle Verify Token Existence Node
-This node check if there is a refresh token saved on CircleService.
+This node check if there is a refresh token saved on Circle Service.
+
 ![ScreenShot](./circleverifytokenexistence.png)
 
 
@@ -54,9 +56,10 @@ This node check if there is a refresh token saved on CircleService.
 - Token does not exist
 
  
-## Circle Exchange Token Node
+## Circle Exchange Refresh Token Node
 This node get a new access token and refresh token using the stored refresh token.
 The new token is stored in the context transientState (refresh_token and access_token).
+
 ![ScreenShot](./circleexchangetoken.png)
 
 
@@ -68,7 +71,8 @@ The new token is stored in the context transientState (refresh_token and access_
  
  
 ## Circle Save Token Node
-This node stores the refresh token into CircleService.
+This node stores the refresh token into Circle Service.
+
 ![ScreenShot](./circlesavetoken.png)
 
 
@@ -76,7 +80,7 @@ This node stores the refresh token into CircleService.
 - **Token Name** The name of the token 
 ### The node provides 2 outcomes
 - Token saved successfully 
-- Token failed to save token
+- Failed to save token
 
 
 ## Circle OAuth2 Login Node
@@ -91,6 +95,4 @@ This node get an access token and refresh token using the User and Password prov
 - **OAuth2 Authorize Endpoint** The OAuth 2.0 client authorize token endpoint.
 - **OAuth2 Access Token Endpoint** The OAuth 2.0 client access token endpoint.
 - **User application URL** The redirect URL
-
-
-
+ 
