@@ -26,6 +26,10 @@ import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.sm.RequiredValueValidator;
 
+/**
+ * This node checks if there is a refresh token stored in Circle Service.
+ */
+
 @Node.Metadata(outcomeProvider = CircleVerifyTokenExistenceNode.OutcomeProvider.class, //
         configClass = CircleVerifyTokenExistenceNode.Config.class, //
         tags = { "basic authentication" }//

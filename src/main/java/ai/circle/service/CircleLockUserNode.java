@@ -37,8 +37,9 @@ import ai.circle.CircleUtil;
 import ai.circle.RSAUtil;
 
 /**
- * A node for Circle Service user locking
+ * This node locks the user and stores the unlock codes into transientState.
  */
+
 @Node.Metadata(outcomeProvider = CircleLockUserNode.OutcomeProvider.class, //
         configClass = CircleLockUserNode.Config.class, //
         tags = { "basic authentication" }//

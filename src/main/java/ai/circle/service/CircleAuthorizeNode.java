@@ -34,6 +34,12 @@ import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.sm.RequiredValueValidator;
 
+/**
+ * This node Authorizes the usage of the Circle Service by getting a Token from
+ * Circle Servers. The Token is added to "Sharedstate" and passed to the other
+ * Circle Nodes
+ */
+
 @Node.Metadata(outcomeProvider = CircleAuthorizeNode.OutcomeProvider.class, //
         configClass = CircleAuthorizeNode.Config.class, tags = "basic authentication" //
 )

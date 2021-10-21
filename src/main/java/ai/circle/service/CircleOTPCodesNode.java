@@ -27,8 +27,8 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.assistedinject.Assisted;
 
 /**
- * A node that reads the second OTP code from sharedState and stores it in
- * transientState {oneTimePassword}
+ * This node holds the second unlock code into the transienteState
+ * {oneTimePassword}
  */
 
 @Node.Metadata(outcomeProvider = CircleOTPCodesNode.OutcomeProvider.class, //

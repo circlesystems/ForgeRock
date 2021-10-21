@@ -29,11 +29,8 @@ import org.slf4j.LoggerFactory;
 import ai.circle.CircleUtil;
 
 /**
- * A node which collects a username from the user via a name callback.
+ * This node collects the unlock codes and stores in sharedState.
  *
- * <p>
- * Places the result in the shared state as 'username'.
- * </p>
  */
 @Node.Metadata(outcomeProvider = CircleOTPCollectorNode.OutcomeProvider.class, //
         configClass = CircleOTPCollectorNode.Config.class, //

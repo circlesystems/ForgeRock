@@ -25,6 +25,11 @@ import com.google.inject.assistedinject.Assisted;
 
 import com.sun.identity.sm.RequiredValueValidator;
 
+/**
+ * This node does the whole OAuth2 flow starting with a username and password
+ * and ends up with an access token and a refresh token.
+ */
+
 @Node.Metadata(outcomeProvider = CircleOAuthLoginNode.OutcomeProvider.class, //
         configClass = CircleOAuthLoginNode.Config.class, //
         tags = { "basic authentication" }//

@@ -28,7 +28,7 @@ import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 
 /**
- * A node that checks to see if Circle Service is running
+ * This node check if Circle Service is running on the local machine.
  */
 @Node.Metadata(outcomeProvider = CircleRunningNode.OutcomeProvider.class, //
         configClass = CircleRunningNode.Config.class, //

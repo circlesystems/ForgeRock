@@ -33,8 +33,11 @@ import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 
 /**
- * Node to unlock a Circle user
+ * This node presents a screen with 2 inputs for entering the unlock codes. It
+ * then reads the unlock codes from sharedState ({code 1} and {code 2}) and, if
+ * the codes are correct, unlocks the user.
  */
+
 @Node.Metadata(outcomeProvider = CircleUnlockUserNode.OutcomeProvider.class, //
         configClass = CircleUnlockUserNode.Config.class, //
         tags = { "basic authentication" }//
