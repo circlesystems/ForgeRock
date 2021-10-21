@@ -19,9 +19,6 @@ import org.forgerock.openam.auth.node.api.TreeContext;
 import org.forgerock.openam.core.realms.Realm;
 
 import org.forgerock.util.i18n.PreferredLocales;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ai.circle.CircleUtil;
 
 import com.google.common.collect.ImmutableList;
@@ -30,15 +27,16 @@ import com.google.inject.assistedinject.Assisted;
 import com.sun.identity.sm.RequiredValueValidator;
 
 /**
- * A node that checks to see if Circle Service is running
+ * A node that reads the refresh token from the transient state and exchanges it
+ * for a new access and refresh token. The new tokens are stored in the
+ * transient state (refresh_token and access_token).
  */
+
 @Node.Metadata(outcomeProvider = CircleExchangeRefreshToken.OutcomeProvider.class, //
         configClass = CircleExchangeRefreshToken.Config.class, //
         tags = { "basic authentication" }//
 )
 public class CircleExchangeRefreshToken implements Node {
-
-    private final Logger logger = LoggerFactory.getLogger(CircleExchangeRefreshToken.class);
     private final static String TRUE_OUTCOME_ID = "refreshToken";
     private final static String FALSE_OUTCOME_ID = "acessToken";
 
@@ -99,8 +97,6 @@ public class CircleExchangeRefreshToken implements Node {
             context.transientState.remove("access_token");
 
             context.transientState.add("refresh_token", newAccessRefreshTokens.get("refreshToken").toString());
-            context.transientState.put("refresh_token", newAccessRefreshTokens.get("refreshToken").toString());
-
             context.transientState.add("acess_token", newAccessRefreshTokens.get("accessToken").toString());
 
             Boolean returnStatus = false;
@@ -110,7 +106,7 @@ public class CircleExchangeRefreshToken implements Node {
             return goTo(returnStatus).build();
 
         } catch (Exception e) {
-            // TODO: handle exception
+            e.printStackTrace();
         }
         return null;
     }

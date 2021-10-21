@@ -2,14 +2,20 @@ package ai.circle.service;
 
 import com.google.inject.assistedinject.Assisted;
 import com.google.common.collect.ImmutableList;
+import com.google.common.base.Strings;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.annotations.sm.Attribute;
 import org.forgerock.util.i18n.PreferredLocales;
+import static org.forgerock.openam.auth.node.api.Action.send;
+import org.forgerock.openam.auth.node.api.Action;
+import org.forgerock.openam.auth.node.api.Node;
+import org.forgerock.openam.auth.node.api.TreeContext;
 
 import javax.inject.Inject;
 import javax.security.auth.callback.Callback;
+
 import java.io.IOException;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
@@ -19,18 +25,11 @@ import java.util.Optional;
 import java.util.Random;
 import java.util.ResourceBundle;
 
-import org.forgerock.openam.auth.node.api.Action;
-import org.forgerock.openam.auth.node.api.Node;
-import org.forgerock.openam.auth.node.api.TreeContext;
-
-import static org.forgerock.openam.auth.node.api.Action.send;
-
 import ai.circle.CircleUtil;
 import ai.circle.Crypto;
 
 import org.json.*;
 
-import com.google.common.base.Strings;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.sm.RequiredValueValidator;
@@ -43,8 +42,7 @@ public class CircleAuthorizeNode implements Node {
 
     private final static String TRUE_OUTCOME_ID = "authorizeTrue";
     private final static String FALSE_OUTCOME_ID = "authorizeFalse";
-    private final static String DEBUG_FILE = "CircleAuthorizeNode";
-    // protected Debug CircleUtil.writelog Debug.getInstance(DEBUG_FILE);
+    private final String scriptName = "/js/authorize.js";
 
     public interface Config {
 
@@ -91,16 +89,12 @@ public class CircleAuthorizeNode implements Node {
         Optional<String> result = context.getCallback(HiddenValueCallback.class).map(HiddenValueCallback::getValue)
                 .filter(scriptOutput -> !Strings.isNullOrEmpty(scriptOutput));
 
-        /**
-         * Check the output value from javascript
-         * 
-         */
+        // check if there is a result of javascript
 
         if (result.isPresent()) {
             JsonValue newSharedState = context.sharedState.copy();
             String resultString = result.get();
 
-            newSharedState.put(CircleUtil.OUT_PARAMETER, resultString);
             newSharedState.put("CircleToken", tokenInstance);
             newSharedState.put("CircleAppKey", config.appKey());
 
@@ -126,11 +120,12 @@ public class CircleAuthorizeNode implements Node {
                 return goTo(false).build();
             }
 
-            String circleNodeScript = CircleUtil.CORE_SCRIPT;
+            String circleNodeScript = CircleUtil.readFileString(scriptName);
 
             circleNodeScript = circleNodeScript.replace("$appKey$", config.appKey());
             circleNodeScript = circleNodeScript.replace("$token$", tokenInstance);
 
+            // Additional javascript to authorize the user
             circleNodeScript += "const isAuthorized = await isAuthorizedNode();\n";
             circleNodeScript += "await autoSubmit();\n";
             circleNodeScript += "output.value = isAuthorized;\n";
@@ -206,8 +201,8 @@ public class CircleAuthorizeNode implements Node {
         @Override
         public List<Outcome> getOutcomes(PreferredLocales locales, JsonValue nodeAttributes) {
             ResourceBundle bundle = locales.getBundleInPreferredLocale(BUNDLE, OutcomeProvider.class.getClassLoader());
-            return ImmutableList.of(new Outcome(TRUE_OUTCOME_ID, bundle.getString("authorizeTrue")),
-                    new Outcome(FALSE_OUTCOME_ID, bundle.getString("authorizeFalse")));
+            return ImmutableList.of(new Outcome(TRUE_OUTCOME_ID, bundle.getString(TRUE_OUTCOME_ID)),
+                    new Outcome(FALSE_OUTCOME_ID, bundle.getString(FALSE_OUTCOME_ID)));
         }
     }
 }

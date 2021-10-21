@@ -37,7 +37,6 @@ public class CircleAuthorizeNodePlugin extends AbstractNodeAmPlugin {
     public void onStartup() throws PluginException {
         for (Class<? extends Node> nodeClass : getNodes()) {
             pluginTools.registerAuthNode(nodeClass);
-
         }
     }
 

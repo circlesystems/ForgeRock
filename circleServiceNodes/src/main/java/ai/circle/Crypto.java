@@ -4,8 +4,9 @@
 package ai.circle;
 
 import javax.crypto.Mac;
-import org.apache.commons.codec.binary.Base64;
 import javax.crypto.spec.SecretKeySpec;
+
+import com.google.api.client.util.Base64;
 
 public class Crypto {
 
@@ -22,4 +23,5 @@ public class Crypto {
         }
 
     }
+
 }

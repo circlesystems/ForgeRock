@@ -9,50 +9,40 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
+
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
+
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import com.google.api.Endpoint;
-
-import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.methods.HttpRequestBase;
 import org.apache.http.impl.client.HttpClientBuilder;
-import org.apache.http.impl.client.LaxRedirectStrategy;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-import org.checkerframework.common.reflection.qual.GetMethod;
-import org.forgerock.openam.auth.node.api.TreeContext;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.json.JSONException;
+
 import org.json.JSONObject;
 
-import groovy.json.StringEscapeUtils;
-import io.grpc.netty.shaded.io.netty.handler.codec.http.HttpMethod;
-
 public class CircleUtil {
-
     public final static String OUT_PARAMETER = "circleJsResult";
     public final static String TRUE_OUTCOME_ID = "isRunningTrue";
     public final static String FALSE_OUTCOME_ID = "isRunningFalse";
-
     public final static String CORE_SCRIPT = readFileString("/js/authorize.js");
     private final static Logger logger = LoggerFactory.getLogger(CircleUtil.class);
 
@@ -86,7 +76,6 @@ public class CircleUtil {
         } finally {
 
         }
-
     }
 
     public static String readAllLines(InputStream in) {
@@ -153,11 +142,12 @@ public class CircleUtil {
             conn.setRequestProperty("Cookie",
                     "iPlanetDirectoryPro=" + authId + "; Path=/; Domain=.partner.com; HttpOnly;");
 
-            String urlParameters = "redirect_uri= " //
+            String urlParameters = "redirect_uri=" //
                     + redirectURL //
                     + "&scope=write&response_type=code&client_id=" //
                     + clientID + "&csrf=" //
                     + authId + "&state=abc123&decision=allow";
+
             byte[] postData = urlParameters.getBytes(StandardCharsets.UTF_8);
             int postDataLength = postData.length;
 
@@ -171,9 +161,11 @@ public class CircleUtil {
             }
 
             int status = conn.getResponseCode();
+
             if (status != HttpURLConnection.HTTP_OK) {
                 if (status == HttpURLConnection.HTTP_MOVED_TEMP || status == HttpURLConnection.HTTP_MOVED_PERM
                         || status == HttpURLConnection.HTTP_SEE_OTHER)
+
                     redirect = true;
             }
 
@@ -186,7 +178,6 @@ public class CircleUtil {
 
             conn.disconnect();
         } catch (Exception e) {
-
             e.printStackTrace();
         }
         return null;
@@ -215,15 +206,12 @@ public class CircleUtil {
         try {
             HttpResponse response = client.execute(post);
             String json = EntityUtils.toString(response.getEntity());
-
-            // CircleUtil.writelog("json: " + json);
-
             JSONObject jret = new JSONObject(json);
             String token = jret.getString("tokenId");
             return token;
 
         } catch (Exception e) {
-
+            e.printStackTrace();
             return "";
         }
 
@@ -302,4 +290,5 @@ public class CircleUtil {
         }
         return null;
     }
+
 }

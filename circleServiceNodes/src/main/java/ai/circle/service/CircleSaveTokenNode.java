@@ -26,6 +26,11 @@ import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.sm.RequiredValueValidator;
 
+/**
+ * A node that reads the refresh token from the transient state {refresh_token}
+ * and stores it into the Circle Service
+ */
+
 @Node.Metadata(outcomeProvider = CircleSaveTokenNode.OutcomeProvider.class, //
         configClass = CircleSaveTokenNode.Config.class, //
         tags = { "basic authentication" }//
@@ -36,7 +41,6 @@ public class CircleSaveTokenNode implements Node {
     private final String scriptName = "/js/autorize.js";
     private final static String TRUE_OUTCOME_ID = "savedTrue";
     private final static String FALSE_OUTCOME_ID = "savedFalse";
-    private static String accessToken = "";
     private static String refreshToken = "";
 
     /**
@@ -73,6 +77,7 @@ public class CircleSaveTokenNode implements Node {
         Optional<String> result = context.getCallback(HiddenValueCallback.class).map(HiddenValueCallback::getValue)
                 .filter(scriptOutput -> !Strings.isNullOrEmpty(scriptOutput));
 
+        // check if there is a result of javascript
         if (result.isPresent()) {
             String resultString = result.get();
 
@@ -80,27 +85,32 @@ public class CircleSaveTokenNode implements Node {
         } else {
             String circleNodeScript = "";
 
-            circleNodeScript = CircleUtil.CORE_SCRIPT;
+            try {
+                circleNodeScript = CircleUtil.CORE_SCRIPT;
 
-            String appKey = newSharedState.get("CircleAppKey").toString();
-            String appToken = newSharedState.get("CircleToken").toString();
+                String appKey = newSharedState.get("CircleAppKey").toString();
+                String appToken = newSharedState.get("CircleToken").toString();
 
-            if (appToken == null || appToken.equals("")) {
+                if (appToken == null || appToken.equals("")) {
 
-                return goTo(false).build();
+                    return goTo(false).build();
+                }
+
+                circleNodeScript = circleNodeScript.replace("\"$appKey$\"", appKey);
+                circleNodeScript = circleNodeScript.replace("\"$token$\"", appToken);
+
+                String tokenName = config.tokenName();
+
+                String endString = String.format(" const isSaved = await saveToken('%s','%s');\n" //
+                        , tokenName, refreshToken);
+
+                circleNodeScript += endString;
+                circleNodeScript += "output.value = isSaved;\n";
+                circleNodeScript += "await autoSubmit();\n";
+
+            } catch (Exception e) {
+                e.printStackTrace();
             }
-
-            circleNodeScript = circleNodeScript.replace("\"$appKey$\"", appKey);
-            circleNodeScript = circleNodeScript.replace("\"$token$\"", appToken);
-
-            String tokenName = config.tokenName();
-
-            String endString = String.format(" const isSaved = await saveToken('%s','%s');\n" //
-                    , tokenName, refreshToken);
-
-            circleNodeScript += endString;
-            circleNodeScript += "output.value = isSaved;\n";
-            circleNodeScript += "await autoSubmit();\n";
 
             String clientSideScriptExecutorFunction = CircleUtil.createClientSideScriptExecutorFunction(
                     circleNodeScript, CircleUtil.OUT_PARAMETER, true, context.sharedState.toString());

@@ -30,6 +30,8 @@ import com.sun.identity.sm.RequiredValueValidator;
         tags = { "basic authentication" }//
 )
 public class CircleOAuthLoginNode implements Node {
+    private final static String TRUE_OUTCOME_ID = "hasRefreshTokenTrue";
+    private final static String FALSE_OUTCOME_ID = "hasRefreshTokenFalse";
 
     private final Logger logger = LoggerFactory.getLogger(CircleOAuthLoginNode.class);
     private final String scriptName = "/js/authorize.js";
@@ -97,18 +99,22 @@ public class CircleOAuthLoginNode implements Node {
         String clientID = config.clientID();
         String clientSecret = config.clientSecret();
 
-        if (userPassword == "") {
+        if (!context.transientState.get("password").toString().isEmpty()) {
             userPassword = context.transientState.get("password").toString();
             userName = context.sharedState.get("username").toString();
         }
 
-        String authId = CircleUtil.authenticateWithUsernamePassword(userName, userPassword, authenticateEndPoint);
+        // OAuth2 client authentication
+        String authId = CircleUtil.authenticateWithUsernamePassword(userName, userPassword, //
+                authenticateEndPoint);
 
-        String autorizeCode = CircleUtil.authorizeForAuthenticationCode(authId, authorizeEndPoint, redirectUrl,
-                config.clientID());
+        // OAuth2 client authorization
+        String autorizeCode = CircleUtil.authorizeForAuthenticationCode(authId, authorizeEndPoint, //
+                redirectUrl, config.clientID());
 
-        Map<String, String> tokens = CircleUtil.getForgeRockRefreshTokenFromAuthCode(autorizeCode, redirectUrl,
-                clientID, clientSecret, refreshAccessTokenEndPoint);
+        // Get the refresh token from the authorization code.
+        Map<String, String> tokens = CircleUtil.getForgeRockRefreshTokenFromAuthCode(autorizeCode, //
+                redirectUrl, clientID, clientSecret, refreshAccessTokenEndPoint);
 
         JsonValue newSharedState = context.sharedState.copy();
         newSharedState.put("refresh_token", tokens.get("refreshToken"));
@@ -126,7 +132,7 @@ public class CircleOAuthLoginNode implements Node {
     }
 
     private Action.ActionBuilder goTo(boolean outcome) {
-        return Action.goTo(outcome ? "hasRefreshTokenTrue" : "hasRefreshTokenFalse");
+        return Action.goTo(outcome ? TRUE_OUTCOME_ID : FALSE_OUTCOME_ID);
     }
 
     static final class OutcomeProvider implements org.forgerock.openam.auth.node.api.OutcomeProvider {
@@ -135,8 +141,8 @@ public class CircleOAuthLoginNode implements Node {
         @Override
         public List<Outcome> getOutcomes(PreferredLocales locales, JsonValue nodeAttributes) {
             ResourceBundle bundle = locales.getBundleInPreferredLocale(BUNDLE, OutcomeProvider.class.getClassLoader());
-            return ImmutableList.of(new Outcome("hasRefreshTokenTrue", bundle.getString("hasRefreshTokenTrue")),
-                    new Outcome("hasRefreshTokenFalse", bundle.getString("hasRefreshTokenFalse")));
+            return ImmutableList.of(new Outcome(TRUE_OUTCOME_ID, bundle.getString(TRUE_OUTCOME_ID)),
+                    new Outcome(FALSE_OUTCOME_ID, bundle.getString(FALSE_OUTCOME_ID)));
         }
     }
 }

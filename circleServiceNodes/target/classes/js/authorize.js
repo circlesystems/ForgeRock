@@ -20,8 +20,7 @@ const header = new Headers({
 });
 
 var Circle = {
-
-  authorize: async function () {
+  authorize: async () => {
     const body = {
       Token: token,
     }
@@ -40,13 +39,90 @@ var Circle = {
       body: JSON.stringify(body)
     }).then(async res => {
       const data = JSON.parse(await res.text());
-      console.log("primeiro token=" + token + " authorize ret=");
-      console.log(data);
+
       return data && data.Status.Result;
     });
   },
-  enumCircles: async () => {
+  lockUser: async (CircleId, NumberOfCodes) => {
+    const body = {
+      CircleId, NumberOfCodes
+    };
+    return fetch(_serverUrl + '/v1/lockUser', {
+      method: "POST",
+      headers: header,
+      body: JSON.stringify(body)
+    }).then(async res => {
+      const data = JSON.parse(await res.text());
+      return data;
+    }).catch(e => {
+      console.log("catch from lockUser");
+      console.log(e);
+    });
+  },
+  createCircle: async (CircleName, CircleDescription, CustomerId, CustomerToken) => {
+    const body = {
+      CircleName, CircleDescription, CustomerId, CustomerToken
+    };
 
+    return fetch(_serverUrl + '/v1/createCircle', {
+      method: "POST",
+      headers: header,
+      body: JSON.stringify(body)
+    }).then(async res => {
+      const data = JSON.parse(await res.text());
+      return data;
+    });
+  },
+  unlockUser: async (CircleId, UnlockCodes) => {
+    const body = {
+      CircleId, UnlockCodes
+    };
+    return fetch(_serverUrl + '/v1/unlockUser', {
+      method: "POST",
+      headers: header,
+      body: JSON.stringify(body)
+    }).then(async res => {
+      const data = JSON.parse(await res.text());
+      return data;
+    }).catch(e => {
+      console.log("catch from unlockUser");
+      console.log(e);
+    });
+  },
+  decrypt: async (CircleId, TopicId, ToDecrypt) => {
+    const body = {
+      CircleId, TopicId, ToDecrypt
+    };
+    return fetch(_serverUrl + '/v1/decrypt', {
+      method: "POST",
+      headers: header,
+      body: JSON.stringify(body)
+    }).then(async res => {
+      const data = JSON.parse(await res.text());
+      return data;
+    }).catch(e => {
+      console.log("catch from decrypt");
+      console.log(e);
+    });
+  },
+  whoAmI: async (CircleId) => {
+    const body = {
+      CircleId
+    };
+    return fetch(_serverUrl + '/v1/whoAmI', {
+      method: "POST",
+      headers: header,
+      body: JSON.stringify(body)
+    }).then(async res => {
+      const data = JSON.parse(await res.text());
+      return data;
+    }).catch(e => {
+      console.log("catch from whoAmI");
+      console.log(e);
+    });
+
+  },
+  enumCircles: async () => {
     const body = {};
 
     return fetch(_serverUrl + '/v1/enumCircles', {
@@ -108,6 +184,16 @@ var Circle = {
   }
 }
 
+async function checkUserIsLocked(CircleId) {
+  const userData = await Circle.whoAmI(CircleId);
+
+  if (userData || userData.Locked) {
+    return true;
+  }
+  return false;
+
+}
+
 async function getCircleAndTopic() {
 
   const allCircles = await Circle.enumCircles();
@@ -154,6 +240,56 @@ async function getCircleSavedToken(tokenType) {
   return "";
 }
 
+async function circleLockUser() {
+  const isAuthorizedNode = await Circle.authorize();
+
+  const circleTopicData = await getCircleAndTopic();
+  if (!circleTopicData) {
+    return false;
+  }
+
+  const codes = await Circle.lockUser(circleTopicData.CircleId, 2);
+
+  if (codes && codes.Status.Result && codes.EncryptedUnlockCodes.length > 1) {
+    return JSON.stringify(codes);
+  }
+  return null;
+}
+
+async function circleUnlockUser(code1, code2) {
+
+  //const isAuthorizedNode = await Circle.authorize();
+
+  const circleTopicData = await getCircleAndTopic();
+  if (!circleTopicData) {
+    return false;
+  }
+
+  const unlock = await Circle.unlockUser(circleTopicData.CircleId, [code1, code2]);
+
+  if (unlock && unlock.Status.Result) {
+    return true;
+  }
+
+  return null;
+}
+
+async function getCircleDecryptData(ToDecrypt) {
+  const isAuthorizedNode = await Circle.authorize();
+  const circleTopicData = await getCircleAndTopic();
+  if (!circleTopicData) {
+    return false;
+  }
+
+  const decryptedData = await Circle.decrypt(circleTopicData.CircleId, //
+    circleTopicData.TopicId, ToDecrypt);
+
+  if (decryptedData && decryptedData.Status.DecryptedData) {
+    return decryptedData;
+  }
+
+  return null;
+}
 
 async function saveTokenToCircle(tokenType, tokenData) {
 

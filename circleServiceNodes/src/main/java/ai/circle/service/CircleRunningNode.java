@@ -20,7 +20,6 @@ import static org.forgerock.openam.auth.node.api.Action.send;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import ai.circle.CircleUtil;
-import javassist.bytecode.stackmap.BasicBlock.Catch;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
@@ -82,7 +81,6 @@ public class CircleRunningNode implements Node {
             ImmutableList<Callback> callbacks = ImmutableList.of(scriptAndSelfSubmitCallback, hiddenValueCallback);
 
             return send(callbacks).build();
-
         }
 
     }
@@ -97,9 +95,8 @@ public class CircleRunningNode implements Node {
         @Override
         public List<Outcome> getOutcomes(PreferredLocales locales, JsonValue nodeAttributes) {
             ResourceBundle bundle = locales.getBundleInPreferredLocale(BUNDLE, OutcomeProvider.class.getClassLoader());
-            return ImmutableList.of(
-                    new Outcome(CircleUtil.TRUE_OUTCOME_ID, bundle.getString(CircleUtil.TRUE_OUTCOME_ID)),
-                    new Outcome(CircleUtil.FALSE_OUTCOME_ID, bundle.getString(CircleUtil.FALSE_OUTCOME_ID)));
+            return ImmutableList.of(new Outcome("isRunningTrue", bundle.getString("isRunningTrue")),
+                    new Outcome("isRunningFalse", bundle.getString("isRunningFalse")));
         }
     }
 }
