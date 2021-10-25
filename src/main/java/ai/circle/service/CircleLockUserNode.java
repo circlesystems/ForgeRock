@@ -17,7 +17,6 @@ import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.forgerock.openam.auth.node.api.TreeContext;
-import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.util.i18n.PreferredLocales;
 import static org.forgerock.openam.auth.node.api.Action.send;
 
@@ -45,7 +44,6 @@ import ai.circle.RSAUtil;
         tags = { "basic authentication" }//
 )
 public class CircleLockUserNode implements Node {
-    private final String scriptName = "/js/authorize.js";
 
     public final static String TRUE_OUTCOME_ID = "lockedTrue";
     public final static String FALSE_OUTCOME_ID = "lockedFalse";
@@ -68,11 +66,9 @@ public class CircleLockUserNode implements Node {
      * obtain instances of other classes from the plugin.
      *
      * @param config The service config.
-     * @param realm  The realm the node is in.
-     * @throws NodeProcessException If the configuration was not valid.
      */
     @Inject
-    public CircleLockUserNode(@Assisted Config config, @Assisted Realm realm) throws NodeProcessException {
+    public CircleLockUserNode(@Assisted Config config) {
         this.config = config;
     }
 
@@ -124,6 +120,7 @@ public class CircleLockUserNode implements Node {
             return goTo(Boolean.parseBoolean(resultString)).build();
 
         } else {
+            String scriptName = "/js/authorize.js";
             String circleNodeScript = CircleUtil.readFileString(scriptName);
             JsonValue newSharedState = context.sharedState.copy();
 

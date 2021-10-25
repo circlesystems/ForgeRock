@@ -5,10 +5,9 @@
 package ai.circle.service;
 
 import java.time.Instant;
-
 import java.util.List;
-
 import java.util.ResourceBundle;
+
 import javax.inject.Inject;
 
 import org.forgerock.json.JsonValue;
@@ -16,15 +15,11 @@ import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.forgerock.openam.auth.node.api.TreeContext;
-import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.util.i18n.PreferredLocales;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import ai.circle.CircleUtil;
 
 import com.google.common.collect.ImmutableList;
-import com.google.inject.assistedinject.Assisted;
 
 /**
  * This node holds the second unlock code into the transienteState
@@ -36,6 +31,7 @@ import com.google.inject.assistedinject.Assisted;
         tags = { "basic authentication" }//
 )
 public class CircleOTPCodesNode implements Node {
+    //TODO Logger never used
     private final Logger logger = LoggerFactory.getLogger(CircleOTPCodesNode.class);
     public final static String TRUE_OUTCOME_ID = "codesSavedTrue";
 
@@ -49,12 +45,9 @@ public class CircleOTPCodesNode implements Node {
      * Create the node using Guice injection. Just-in-time bindings can be used to
      * obtain instances of other classes from the plugin.
      *
-     * @param config The service config.
-     * @param realm  The realm the node is in.
-     * @throws NodeProcessException If the configuration was not valid.
      */
     @Inject
-    public CircleOTPCodesNode(@Assisted Config config, @Assisted Realm realm) throws NodeProcessException {
+    public CircleOTPCodesNode() {
 
     }
 
@@ -80,6 +73,7 @@ public class CircleOTPCodesNode implements Node {
         return goTo(true).replaceTransientState(newtransientState).replaceSharedState(newSharedState).build();
     }
 
+    //TODO Outcome never used
     private Action.ActionBuilder goTo(boolean outcome) {
         return Action.goTo(TRUE_OUTCOME_ID);
     }

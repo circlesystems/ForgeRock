@@ -14,7 +14,6 @@ import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.forgerock.openam.auth.node.api.TreeContext;
-import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.util.i18n.PreferredLocales;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,8 +37,8 @@ public class CircleOAuthLoginNode implements Node {
     private final static String TRUE_OUTCOME_ID = "hasRefreshTokenTrue";
     private final static String FALSE_OUTCOME_ID = "hasRefreshTokenFalse";
 
+    //TODO Logging is never used
     private final Logger logger = LoggerFactory.getLogger(CircleOAuthLoginNode.class);
-    private final String scriptName = "/js/authorize.js";
     private static String userPassword = "";
     private static String userName = "";
 
@@ -86,11 +85,9 @@ public class CircleOAuthLoginNode implements Node {
      * obtain instances of other classes from the plugin.
      *
      * @param config The service config.
-     * @param realm  The realm the node is in.
-     * @throws NodeProcessException If the configuration was not valid.
      */
     @Inject
-    public CircleOAuthLoginNode(@Assisted Config config, @Assisted Realm realm) throws NodeProcessException {
+    public CircleOAuthLoginNode(@Assisted Config config) {
         this.config = config;
     }
 
@@ -127,7 +124,7 @@ public class CircleOAuthLoginNode implements Node {
 
         context.transientState.add("refresh_token", tokens.get("refreshToken"));
 
-        Boolean returnState = false;
+        boolean returnState = false;
 
         if (!tokens.get("refreshToken").isEmpty()) {
             returnState = true;

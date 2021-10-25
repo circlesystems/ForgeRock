@@ -16,7 +16,6 @@ import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.forgerock.openam.auth.node.api.TreeContext;
-import org.forgerock.openam.core.realms.Realm;
 
 import org.forgerock.util.i18n.PreferredLocales;
 import ai.circle.CircleUtil;
@@ -38,9 +37,8 @@ import com.sun.identity.sm.RequiredValueValidator;
 )
 public class CircleExchangeRefreshToken implements Node {
     private final static String TRUE_OUTCOME_ID = "refreshToken";
+    //TODO Field is never used
     private final static String FALSE_OUTCOME_ID = "acessToken";
-
-    // private final Config config;
 
     /**
      * Configuration for the node.
@@ -72,11 +70,9 @@ public class CircleExchangeRefreshToken implements Node {
      * obtain instances of other classes from the plugin.
      *
      * @param config The service config.
-     * @param realm  The realm the node is in.
-     * @throws NodeProcessException If the configuration was not valid.
      */
     @Inject
-    public CircleExchangeRefreshToken(@Assisted Config config, @Assisted Realm realm) throws NodeProcessException {
+    public CircleExchangeRefreshToken(@Assisted Config config) {
         this.config = config;
     }
 
@@ -99,10 +95,7 @@ public class CircleExchangeRefreshToken implements Node {
             context.transientState.add("refresh_token", newAccessRefreshTokens.get("refreshToken").toString());
             context.transientState.add("acess_token", newAccessRefreshTokens.get("accessToken").toString());
 
-            Boolean returnStatus = false;
-            if (!newAccessRefreshTokens.get("refreshToken").isEmpty()) {
-                returnStatus = true;
-            }
+            boolean returnStatus = !newAccessRefreshTokens.get("refreshToken").isEmpty();
             return goTo(returnStatus).build();
 
         } catch (Exception e) {
@@ -111,6 +104,7 @@ public class CircleExchangeRefreshToken implements Node {
         return null;
     }
 
+    //TODO Outcome is never used
     private Action.ActionBuilder goTo(boolean outcome) {
         return Action.goTo("refreshToken");
     }

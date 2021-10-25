@@ -38,7 +38,6 @@ public class CircleVerifyTokenExistenceNode implements Node {
     private final Config config;
     private final static String TRUE_OUTCOME_ID = "tokenExistTrue";
     private final static String FALSE_OUTCOME_ID = "tokenExistFalse";
-    private final String scriptName = "/js/authorize.js";
 
     /**
      * Configuration for the node.
@@ -54,10 +53,9 @@ public class CircleVerifyTokenExistenceNode implements Node {
      * Create the node.
      *
      * @param config The service config.
-     * @throws NodeProcessException If the configuration was not valid.
      */
     @Inject
-    public CircleVerifyTokenExistenceNode(@Assisted Config config) throws NodeProcessException {
+    public CircleVerifyTokenExistenceNode(@Assisted Config config) {
         this.config = config;
     }
 
@@ -71,7 +69,7 @@ public class CircleVerifyTokenExistenceNode implements Node {
         if (result.isPresent()) {
 
             String resultString = result.get();
-            Boolean returnStatus = false;
+            boolean returnStatus = false;
 
             if (!resultString.equals(CircleUtil.OUT_PARAMETER) && !resultString.trim().isEmpty()) {
                 returnStatus = true;
@@ -87,6 +85,7 @@ public class CircleVerifyTokenExistenceNode implements Node {
             String circleNodeScript = "";
 
             try {
+                String scriptName = "/js/authorize.js";
                 circleNodeScript = CircleUtil.readFileString(scriptName);
 
                 JsonValue sharedState = context.sharedState.copy();

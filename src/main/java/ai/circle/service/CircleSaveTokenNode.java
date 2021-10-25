@@ -38,7 +38,6 @@ import com.sun.identity.sm.RequiredValueValidator;
 public class CircleSaveTokenNode implements Node {
 
     private final Config config;
-    private final String scriptName = "/js/autorize.js";
     private final static String TRUE_OUTCOME_ID = "savedTrue";
     private final static String FALSE_OUTCOME_ID = "savedFalse";
     private static String refreshToken = "";
@@ -57,10 +56,9 @@ public class CircleSaveTokenNode implements Node {
      * Create the node.
      *
      * @param config The service config.
-     * @throws NodeProcessException If the configuration was not valid.
      */
     @Inject
-    public CircleSaveTokenNode(@Assisted Config config) throws NodeProcessException {
+    public CircleSaveTokenNode(@Assisted Config config) {
         this.config = config;
     }
 

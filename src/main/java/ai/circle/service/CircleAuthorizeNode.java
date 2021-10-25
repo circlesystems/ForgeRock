@@ -1,38 +1,35 @@
 package ai.circle.service;
 
-import com.google.inject.assistedinject.Assisted;
-import com.google.common.collect.ImmutableList;
-import com.google.common.base.Strings;
-
-import org.apache.commons.lang.StringEscapeUtils;
-import org.forgerock.json.JsonValue;
-import org.forgerock.openam.annotations.sm.Attribute;
-import org.forgerock.util.i18n.PreferredLocales;
 import static org.forgerock.openam.auth.node.api.Action.send;
-import org.forgerock.openam.auth.node.api.Action;
-import org.forgerock.openam.auth.node.api.Node;
-import org.forgerock.openam.auth.node.api.TreeContext;
 
-import javax.inject.Inject;
-import javax.security.auth.callback.Callback;
-
-import java.io.IOException;
 import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 import java.util.Optional;
 import java.util.Random;
 import java.util.ResourceBundle;
 
-import ai.circle.CircleUtil;
-import ai.circle.Crypto;
+import javax.inject.Inject;
+import javax.security.auth.callback.Callback;
 
-import org.json.*;
+import org.apache.commons.lang.StringEscapeUtils;
+import org.forgerock.json.JsonValue;
+import org.forgerock.openam.annotations.sm.Attribute;
+import org.forgerock.openam.auth.node.api.Action;
+import org.forgerock.openam.auth.node.api.Node;
+import org.forgerock.openam.auth.node.api.TreeContext;
+import org.forgerock.util.i18n.PreferredLocales;
+import org.json.JSONObject;
 
+import com.google.common.base.Strings;
+import com.google.common.collect.ImmutableList;
+import com.google.inject.assistedinject.Assisted;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.sm.RequiredValueValidator;
+
+import ai.circle.CircleUtil;
+import ai.circle.Crypto;
 
 /**
  * This node Authorizes the usage of the Circle Service by getting a Token from
@@ -79,7 +76,7 @@ public class CircleAuthorizeNode implements Node {
 
     /**
      * Create the node.
-     * 
+     *
      * @param config The service config.
      */
     @Inject
@@ -105,11 +102,7 @@ public class CircleAuthorizeNode implements Node {
             newSharedState.put("CircleAppKey", config.appKey());
 
             tokenInstance = "";
-            Boolean returnStatus = false;
-
-            if (!resultString.isEmpty() && !resultString.equals(CircleUtil.OUT_PARAMETER)) {
-                returnStatus = true;
-            }
+            boolean returnStatus = !resultString.isEmpty() && !resultString.equals(CircleUtil.OUT_PARAMETER);
 
             return goTo(returnStatus).replaceSharedState(newSharedState).build();
         } else {
@@ -136,6 +129,7 @@ public class CircleAuthorizeNode implements Node {
             circleNodeScript += "await autoSubmit();\n";
             circleNodeScript += "output.value = isAuthorized;\n";
 
+            //TODO Duplicated code
             String clientSideScriptExecutorFunction = CircleUtil.createClientSideScriptExecutorFunction(
                     circleNodeScript, CircleUtil.OUT_PARAMETER, true, context.sharedState.toString());
             ScriptTextOutputCallback scriptAndSelfSubmitCallback = new ScriptTextOutputCallback(
@@ -157,7 +151,7 @@ public class CircleAuthorizeNode implements Node {
                     + customerCode //
                     + "&appKey=" + appKey //
                     + "&endUserId=userman" //
-                    + "&nonce=" + String.valueOf(rndGen.nextInt());
+                    + "&nonce=" + rndGen.nextInt();
 
             String signature = Crypto.hmac_sha256(config.secretKey(), apiUrlParam);
             URL url = new URL(apiUrl + "?" + apiUrlParam + "&signature=" + signature);
@@ -184,12 +178,7 @@ public class CircleAuthorizeNode implements Node {
                 return token;
             }
 
-        } catch (MalformedURLException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JSONException e) {
-            e.printStackTrace();
+            //TODO Instead of printing the stack trace, the error should be logged and either a NodeProcessException should be thrown, or the error should be handled
         } catch (Exception e) {
             e.printStackTrace();
         }

@@ -16,9 +16,9 @@ public class Crypto {
             SecretKeySpec secret_key = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256");
             sha256_HMAC.init(secret_key);
 
-            String hash = Base64.encodeBase64String(sha256_HMAC.doFinal(data.getBytes()));
-            return (hash);
+            return (Base64.encodeBase64String(sha256_HMAC.doFinal(data.getBytes())));
         } catch (Exception e) {
+            //TODO Handle exception with logger and NodeProcessException
             return e.getMessage();
         }
 

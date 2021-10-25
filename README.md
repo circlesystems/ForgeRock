@@ -4,7 +4,7 @@
 -->
 # Circle Nodes for ForgeRock
 
-A Circle Service node collection for ForgeRock [Identity Platform][forgerock_platform] 7.1.0 and above.  
+A Circle Service node collection for ForgeRock Identity Platform 7.1.0 and above.  
 
 ## Installation
 
