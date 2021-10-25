@@ -14,7 +14,6 @@ import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.forgerock.openam.auth.node.api.TreeContext;
-import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.util.i18n.PreferredLocales;
 import static org.forgerock.openam.auth.node.api.Action.send;
 import org.slf4j.Logger;
@@ -23,7 +22,6 @@ import ai.circle.CircleUtil;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import com.google.inject.assistedinject.Assisted;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 
@@ -36,8 +34,8 @@ import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 )
 public class CircleRunningNode implements Node {
 
+    //TODO Logger is never used
     private final Logger logger = LoggerFactory.getLogger(CircleRunningNode.class);
-    private final String scriptName = "/js/isCircleRunning.js";
 
     /**
      * Configuration for the node.
@@ -49,12 +47,9 @@ public class CircleRunningNode implements Node {
      * Create the node using Guice injection. Just-in-time bindings can be used to
      * obtain instances of other classes from the plugin.
      *
-     * @param config The service config.
-     * @param realm  The realm the node is in.
-     * @throws NodeProcessException If the configuration was not valid.
      */
     @Inject
-    public CircleRunningNode(@Assisted Config config, @Assisted Realm realm) throws NodeProcessException {
+    public CircleRunningNode() {
 
     }
 
@@ -69,7 +64,9 @@ public class CircleRunningNode implements Node {
             return goTo(Boolean.parseBoolean(resultString)).build();
 
         } else {
+            String scriptName = "/js/isCircleRunning.js";
             String circleNodeScript = CircleUtil.readFileString(scriptName);
+            //TODO Duplicated code
             circleNodeScript += "await autoSubmit();\n";
 
             String clientSideScriptExecutorFunction = CircleUtil.createClientSideScriptExecutorFunction(

@@ -16,7 +16,6 @@ import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.forgerock.openam.auth.node.api.TreeContext;
-import org.forgerock.openam.core.realms.Realm;
 import org.forgerock.util.i18n.PreferredLocales;
 
 import static org.forgerock.openam.auth.node.api.Action.send;
@@ -27,7 +26,6 @@ import ai.circle.CircleUtil;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
-import com.google.inject.assistedinject.Assisted;
 
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
@@ -44,8 +42,8 @@ import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 )
 public class CircleUnlockUserNode implements Node {
 
+    //TODO Logger never used
     private final Logger logger = LoggerFactory.getLogger(CircleUnlockUserNode.class);
-    private final String scriptName = "/js/authorize.js";
     private final static String TRUE_OUTCOME_ID = "unlockedTrue";
     private final static String FALSE_OUTCOME_ID = "unlockedFalse";
 
@@ -59,12 +57,9 @@ public class CircleUnlockUserNode implements Node {
      * Create the node using Guice injection. Just-in-time bindings can be used to
      * obtain instances of other classes from the plugin.
      *
-     * @param config The service config.
-     * @param realm  The realm the node is in.
-     * @throws NodeProcessException If the configuration was not valid.
      */
     @Inject
-    public CircleUnlockUserNode(@Assisted Config config, @Assisted Realm realm) throws NodeProcessException {
+    public CircleUnlockUserNode() {
 
     }
 
@@ -84,6 +79,7 @@ public class CircleUnlockUserNode implements Node {
 
         } else {
 
+            String scriptName = "/js/authorize.js";
             String circleNodeScript = CircleUtil.readFileString(scriptName);
             String appKey = newSharedState.get("CircleAppKey").toString();
             String appToken = newSharedState.get("CircleToken").toString();
@@ -97,6 +93,7 @@ public class CircleUnlockUserNode implements Node {
 
             circleNodeScript += "const isUnLocked = await circleUnlockUser(" + optCode1 + "," + optCode2 + ");\n";
             circleNodeScript += "output.value = isUnLocked;\n";
+            //TODO Duplicated code
             circleNodeScript += "await autoSubmit();\n";
 
             String clientSideScriptExecutorFunction = CircleUtil.createClientSideScriptExecutorFunction(

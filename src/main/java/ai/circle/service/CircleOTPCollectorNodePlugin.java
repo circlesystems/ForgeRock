@@ -15,13 +15,14 @@ import com.sun.identity.sm.SMSException;
 /**
  * Core nodes installed by default with no engine dependencies.
  */
+//TODO Only one plugin is required
 public class CircleOTPCollectorNodePlugin extends AbstractNodeAmPlugin {
 
     private final AnnotatedServiceRegistry serviceRegistry;
 
     /**
      * DI-enabled constructor.
-     * 
+     *
      * @param serviceRegistry A service registry instance.
      */
     @Inject

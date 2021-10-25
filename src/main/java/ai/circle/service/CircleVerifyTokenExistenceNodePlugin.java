@@ -12,6 +12,7 @@ import org.forgerock.openam.sm.AnnotatedServiceRegistry;
 /**
  * Core nodes installed by default with no engine dependencies.
  */
+//TODO Only one plugin is required
 public class CircleVerifyTokenExistenceNodePlugin extends AbstractNodeAmPlugin {
 
     private final AnnotatedServiceRegistry serviceRegistry;

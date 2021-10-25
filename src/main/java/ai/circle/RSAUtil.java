@@ -20,9 +20,8 @@ public class RSAUtil {
             KeyFactory keyFactory = KeyFactory.getInstance("RSA");
             publicKey = keyFactory.generatePublic(keySpec);
             return publicKey;
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
+        } catch (NoSuchAlgorithmException | InvalidKeySpecException e) {
+            //TODO Handle exception with logger and NodeProcessException
             e.printStackTrace();
         }
         return publicKey;
@@ -38,6 +37,7 @@ public class RSAUtil {
             e.printStackTrace();
         }
         try {
+            //TODO May generate a NullPointer exception
             privateKey = keyFactory.generatePrivate(keySpec);
         } catch (InvalidKeySpecException e) {
             e.printStackTrace();
@@ -45,6 +45,7 @@ public class RSAUtil {
         return privateKey;
     }
 
+    //TODO Method never used
     public static byte[] encrypt(String data, String publicKey) throws BadPaddingException, IllegalBlockSizeException,
             InvalidKeyException, NoSuchPaddingException, NoSuchAlgorithmException {
         Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
@@ -68,8 +69,7 @@ public class RSAUtil {
         try {
             java.security.Security.addProvider(new org.bouncycastle.jce.provider.BouncyCastleProvider());
 
-            String decryptedString = RSAUtil.decrypt(encryptedString, privateKey);
-            return (decryptedString);
+            return (RSAUtil.decrypt(encryptedString, privateKey));
         } catch (NoSuchAlgorithmException | InvalidKeyException | IllegalBlockSizeException | BadPaddingException
                 | NoSuchPaddingException e) {
             e.printStackTrace();

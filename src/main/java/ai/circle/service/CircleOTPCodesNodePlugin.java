@@ -10,6 +10,7 @@ import org.forgerock.openam.auth.node.api.AbstractNodeAmPlugin;
 import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.plugins.PluginException;
 
+//TODO Only one plugin is required
 public class CircleOTPCodesNodePlugin extends AbstractNodeAmPlugin {
 
     static private String currentVersion = "1.0.0";
@@ -31,7 +32,7 @@ public class CircleOTPCodesNodePlugin extends AbstractNodeAmPlugin {
      * Handle plugin installation. This method will only be called once, on first AM
      * startup once the plugin is included in the classpath. The
      * {@link #onStartup()} method will be called after this one.
-     * 
+     *
      * No need to implement this unless your AuthNode has specific requirements on
      * install.
      */
@@ -44,7 +45,7 @@ public class CircleOTPCodesNodePlugin extends AbstractNodeAmPlugin {
      * Handle plugin startup. This method will be called every time AM starts, after
      * {@link #onInstall()}, {@link #onAmUpgrade(String, String)} and
      * {@link #upgrade(String)} have been called (if relevant).
-     * 
+     *
      * No need to implement this unless your AuthNode has specific requirements on
      * startup.
      *
@@ -59,7 +60,7 @@ public class CircleOTPCodesNodePlugin extends AbstractNodeAmPlugin {
      * This method will be called when the version returned by
      * {@link #getPluginVersion()} is higher than the version already installed.
      * This method will be called before the {@link #onStartup()} method.
-     * 
+     *
      * No need to implement this untils there are multiple versions of your auth
      * node.
      *

@@ -9,16 +9,11 @@ import java.io.DataOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-
 import java.net.HttpURLConnection;
 import java.net.URL;
-
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
-import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,11 +28,9 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
-
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import org.json.JSONObject;
 
 public class CircleUtil {
     public final static String OUT_PARAMETER = "circleJsResult";
@@ -48,13 +41,14 @@ public class CircleUtil {
 
     /**
      * Read file content into a string
-     * 
+     *
      * @param fileName
      * @throws IOException file does not exist or cannot read the content
      */
 
+    //TODO Method never used
     public static String readFileAsString(String fileName) throws IOException {
-        String text = "";
+        String text;
         try {
             text = new String(Files.readAllBytes(Paths.get(fileName)));
         } catch (IOException e) {
@@ -67,6 +61,7 @@ public class CircleUtil {
         try {
             InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
             String data = readAllLines(in);
+            //TODO Close may return a null pointer. Need to handle that
             in.close();
             return data;
         } catch (Exception e) {
@@ -74,6 +69,7 @@ public class CircleUtil {
             logger.error("Can´t read file " + path, e);
             return null;
         } finally {
+            //TODO Nothing in finally block?
 
         }
     }
@@ -171,9 +167,8 @@ public class CircleUtil {
 
             if (redirect) {
                 String redirectUrl = conn.getHeaderField("Location");
-                String code = redirectUrl.split("code=")[1].split("&")[0];
 
-                return code;
+                return redirectUrl.split("code=")[1].split("&")[0];
             }
 
             conn.disconnect();
@@ -183,9 +178,10 @@ public class CircleUtil {
         return null;
     }
 
+    //TODO Method never used
     public static Map<String, String> getQueryMap(String query) {
         String[] params = query.split("&");
-        Map<String, String> map = new HashMap<String, String>();
+        Map<String, String> map = new HashMap<>();
 
         for (String param : params) {
             String name = param.split("=")[0];
@@ -207,8 +203,7 @@ public class CircleUtil {
             HttpResponse response = client.execute(post);
             String json = EntityUtils.toString(response.getEntity());
             JSONObject jret = new JSONObject(json);
-            String token = jret.getString("tokenId");
-            return token;
+            return jret.getString("tokenId");
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -226,13 +221,14 @@ public class CircleUtil {
 
             post.setHeader("Accept-API-Version", "resource=2.0, protocol=1.0");
 
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("client_id", clientId));
             params.add(new BasicNameValuePair("client_secret", clientSecret));
             params.add(new BasicNameValuePair("code", code));
             params.add(new BasicNameValuePair("grant_type", "authorization_code"));
             params.add(new BasicNameValuePair("redirect_uri", redirectUrl));
 
+            //TODO Duplicated code
             post.setEntity(new UrlEncodedFormEntity(params));
 
             HttpResponse response = client.execute(post);
@@ -243,13 +239,14 @@ public class CircleUtil {
             String refreshToken = jret.getString("refresh_token");
             String accessToken = jret.getString("access_token");
 
-            HashMap<String, String> ret = new HashMap<String, String>();
+            HashMap<String, String> ret = new HashMap<>();
             ret.put("refreshToken", refreshToken);
             ret.put("accessToken", accessToken);
             return ret;
 
         } catch (Exception e) {
 
+            //TODO Handle exception with logger and NodeProcessException
             e.printStackTrace();
         }
         return null;
@@ -264,11 +261,12 @@ public class CircleUtil {
 
             post.setHeader("Accept-API-Version", "resource=2.0, protocol=1.0");
 
-            List<NameValuePair> params = new ArrayList<NameValuePair>();
+            List<NameValuePair> params = new ArrayList<>();
             params.add(new BasicNameValuePair("client_id", clientId));
             params.add(new BasicNameValuePair("client_secret", clientSecret));
             params.add(new BasicNameValuePair("refresh_token", refreshToken));
             params.add(new BasicNameValuePair("grant_type", "refresh_token"));
+            //TODO Duplicated code
             post.setEntity(new UrlEncodedFormEntity(params));
 
             HttpResponse response = client.execute(post);
@@ -279,7 +277,7 @@ public class CircleUtil {
             String newRefreshToken = jret.getString("refresh_token");
             String newAccessToken = jret.getString("access_token");
 
-            HashMap<String, String> ret = new HashMap<String, String>();
+            HashMap<String, String> ret = new HashMap<>();
             ret.put("refreshToken", newRefreshToken);
             ret.put("accessToken", newAccessToken);
             return ret;
