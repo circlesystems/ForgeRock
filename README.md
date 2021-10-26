@@ -17,7 +17,7 @@ run "mvn clean install" in the directory containing the pom.xml
 ## Circle Service is Running Node
 This node check if Circle Service is running on the local machine.
 
-![ScreenShot](./circleisrunning.png)
+![ScreenShot](./media/circleisrunning.png)
 
 
 ### The node provides 2 outcomes:
@@ -28,7 +28,7 @@ This node check if Circle Service is running on the local machine.
 ## Circle Authorize Node
 This node Authorizes the usage of the Circle Service by getting a Token from Circle Servers. The Token is added to "Sharedstate" and passed to the other Circle Nodes
 
-![ScreenShot](./circleauthorize.png)
+![ScreenShot](./media/circleauthorize.png)
 
 
 ### The node provides 2 outcomes
@@ -48,7 +48,7 @@ This node Authorizes the usage of the Circle Service by getting a Token from Cir
 ## Circle Verify Token Existence Node
 This node checks if there is a refresh token stored in Circle Service.
 
-![ScreenShot](./circleverifytokenexistence.png)
+![ScreenShot](./media/circleverifytokenexistence.png)
 
 
 
@@ -63,7 +63,7 @@ This node checks if there is a refresh token stored in Circle Service.
 This node receives a new access token and a refresh token using the stored refresh token (Remember to send to Save Token Node to make sure you keep the updated refresh token)
 The new tokens are stored into the "transientState" ({refresh_token} and {access_token}).
 
-![ScreenShot](./circleexchangetoken.png)
+![ScreenShot](./media/circleexchangetoken.png)
 
 
 ### Node settings
@@ -76,7 +76,7 @@ The new tokens are stored into the "transientState" ({refresh_token} and {access
 ## Circle Save Token Node
 This node stores the refresh token in the Circle Service.
 
-![ScreenShot](./circlesavetoken.png)
+![ScreenShot](./media/circlesavetoken.png)
 
 
 ### Node settings
@@ -90,7 +90,7 @@ This node stores the refresh token in the Circle Service.
 This node does the whole OAuth2 flow starting with a username and password and ends up with an access token and a refresh token.
 
 
-![ScreenShot](./circleoauth2login.png)
+![ScreenShot](./media/circleoauth2login.png)
 
 ### Node settings
 - **OAuth2 Client ID** The OAuth 2.0 Client ID
@@ -107,7 +107,7 @@ This node does the whole OAuth2 flow starting with a username and password and e
 ## Circle Lock User
 This node locks the user and stores the unlock codes into transientState.
 
-![ScreenShot](./circlelockuser.png)
+![ScreenShot](./media/circlelockuser.png)
 
 
 ### Node settings
@@ -123,19 +123,19 @@ This node locks the user and stores the unlock codes into transientState.
 ## Circle OTP Codes Holder
 This node holds the second unlock code in the transienteState {oneTimePassword} 
 
-![ScreenShot](./circleotpcodesholder.png)
+![ScreenShot](./media/circleotpcodesholder.png)
 
 
 ## Circle OTP Collector
 This node collects the unlock codes and stores in sharedState.
 
-![ScreenShot](./circleotpcollector.png)
+![ScreenShot](./media/circleotpcollector.png)
 
 
 ## Circle Unlock User
 This node presents a screen with 2 inputs for entering the unlock codes. It then reads the unlock codes from sharedState ({code 1} and {code 2}) and, if the codes are correct, unlocks the user.
 
-![ScreenShot](./circleunlockuser.png)
+![ScreenShot](./media/circleunlockuser.png)
 
 ### The node provides 2 outcomes
 - Successfully unlocked

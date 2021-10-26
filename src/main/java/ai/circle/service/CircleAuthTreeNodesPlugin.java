@@ -1,7 +1,6 @@
 package ai.circle.service;
 
 import static java.util.Arrays.asList;
-
 import javax.inject.Inject;
 
 import org.forgerock.openam.auth.node.api.AbstractNodeAmPlugin;
@@ -12,20 +11,16 @@ import org.forgerock.openam.sm.AnnotatedServiceRegistry;
 /**
  * Core nodes installed by default with no engine dependencies.
  */
-
-public class CircleAuthorizeNodePlugin extends AbstractNodeAmPlugin {
-
-    private final AnnotatedServiceRegistry serviceRegistry;
+public class CircleAuthTreeNodesPlugin extends AbstractNodeAmPlugin {
 
     /**
      * DI-enabled constructor.
      * 
      * @param serviceRegistry A service registry instance.
+     * @return
      */
-
     @Inject
-    public CircleAuthorizeNodePlugin(AnnotatedServiceRegistry serviceRegistry) {
-        this.serviceRegistry = serviceRegistry;
+    public void InputCollectorNodePlugin(AnnotatedServiceRegistry serviceRegistry) {
     }
 
     @Override
@@ -36,12 +31,21 @@ public class CircleAuthorizeNodePlugin extends AbstractNodeAmPlugin {
     @Override
     public void onStartup() throws PluginException {
         for (Class<? extends Node> nodeClass : getNodes()) {
-            pluginTools.registerAuthNode(nodeClass);
+            pluginTools.startAuthNode(nodeClass);
         }
     }
 
     @Override
     protected Iterable<? extends Class<? extends Node>> getNodes() {
-        return asList(CircleAuthorizeNode.class);
+        return asList(CircleAuthorizeNode.class, //
+                CircleExchangeRefreshToken.class, //
+                CircleLockUserNode.class, //
+                CircleOAuthLoginNode.class, //
+                CircleOTPCodesNode.class, //
+                CircleOTPCollectorNode.class, //
+                CircleRunningNode.class, //
+                CircleSaveTokenNode.class, //
+                CircleUnlockUserNode.class, //
+                CircleVerifyTokenExistenceNode.class);
     }
 }
