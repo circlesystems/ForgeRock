@@ -16,14 +16,11 @@ import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.forgerock.openam.auth.node.api.TreeContext;
 import org.forgerock.util.i18n.PreferredLocales;
 import static org.forgerock.openam.auth.node.api.Action.send;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import ai.circle.CircleUtil;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
-import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 
 /**
  * This node check if Circle Service is running on the local machine.
@@ -33,9 +30,6 @@ import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
         tags = { "basic authentication" }//
 )
 public class CircleRunningNode implements Node {
-
-    //TODO Logger is never used
-    private final Logger logger = LoggerFactory.getLogger(CircleRunningNode.class);
 
     /**
      * Configuration for the node.
@@ -60,26 +54,20 @@ public class CircleRunningNode implements Node {
                 .filter(scriptOutput -> !Strings.isNullOrEmpty(scriptOutput));
 
         if (result.isPresent()) {
+
             String resultString = result.get();
             return goTo(Boolean.parseBoolean(resultString)).build();
 
         } else {
             String scriptName = "/js/isCircleRunning.js";
             String circleNodeScript = CircleUtil.readFileString(scriptName);
-            //TODO Duplicated code
+
             circleNodeScript += "await autoSubmit();\n";
 
-            String clientSideScriptExecutorFunction = CircleUtil.createClientSideScriptExecutorFunction(
-                    circleNodeScript, CircleUtil.OUT_PARAMETER, true, context.sharedState.toString());
-            ScriptTextOutputCallback scriptAndSelfSubmitCallback = new ScriptTextOutputCallback(
-                    clientSideScriptExecutorFunction);
-
-            HiddenValueCallback hiddenValueCallback = new HiddenValueCallback(CircleUtil.OUT_PARAMETER);
-            ImmutableList<Callback> callbacks = ImmutableList.of(scriptAndSelfSubmitCallback, hiddenValueCallback);
+            ImmutableList<Callback> callbacks = CircleUtil.getScriptAndSelfSubmitCallback(circleNodeScript);
 
             return send(callbacks).build();
         }
-
     }
 
     private Action.ActionBuilder goTo(boolean outcome) {

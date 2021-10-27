@@ -15,20 +15,17 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeProcessException;
+import org.forgerock.openam.auth.node.api.NodeState;
 import org.forgerock.openam.auth.node.api.TreeContext;
 import org.forgerock.util.i18n.PreferredLocales;
 
 import static org.forgerock.openam.auth.node.api.Action.send;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import ai.circle.CircleUtil;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
-import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 
 /**
  * This node presents a screen with 2 inputs for entering the unlock codes. It
@@ -41,9 +38,6 @@ import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
         tags = { "basic authentication" }//
 )
 public class CircleUnlockUserNode implements Node {
-
-    //TODO Logger never used
-    private final Logger logger = LoggerFactory.getLogger(CircleUnlockUserNode.class);
     private final static String TRUE_OUTCOME_ID = "unlockedTrue";
     private final static String FALSE_OUTCOME_ID = "unlockedFalse";
 
@@ -66,7 +60,7 @@ public class CircleUnlockUserNode implements Node {
     @Override
     public Action process(TreeContext context) throws NodeProcessException {
 
-        JsonValue newSharedState = context.sharedState.copy();
+        NodeState newNodeState = context.getStateFor(this);
 
         Optional<String> result = context.getCallback(HiddenValueCallback.class).map(HiddenValueCallback::getValue)
                 .filter(scriptOutput -> !Strings.isNullOrEmpty(scriptOutput));
@@ -81,28 +75,21 @@ public class CircleUnlockUserNode implements Node {
 
             String scriptName = "/js/authorize.js";
             String circleNodeScript = CircleUtil.readFileString(scriptName);
-            String appKey = newSharedState.get("CircleAppKey").toString();
-            String appToken = newSharedState.get("CircleToken").toString();
+            String appKey = newNodeState.get("CircleAppKey").toString();
+            String appToken = newNodeState.get("CircleToken").toString();
 
             // Circle OTP unlock codes
-            String optCode1 = newSharedState.get("code 1").toString();
-            String optCode2 = newSharedState.get("code 2").toString();
+            String optCode1 = newNodeState.get("code 1").toString();
+            String optCode2 = newNodeState.get("code 2").toString();
 
             circleNodeScript = circleNodeScript.replace("\"$appKey$\"", appKey);
             circleNodeScript = circleNodeScript.replace("\"$token$\"", appToken);
 
             circleNodeScript += "const isUnLocked = await circleUnlockUser(" + optCode1 + "," + optCode2 + ");\n";
             circleNodeScript += "output.value = isUnLocked;\n";
-            //TODO Duplicated code
             circleNodeScript += "await autoSubmit();\n";
 
-            String clientSideScriptExecutorFunction = CircleUtil.createClientSideScriptExecutorFunction(
-                    circleNodeScript, CircleUtil.OUT_PARAMETER, true, context.sharedState.toString());
-            ScriptTextOutputCallback scriptAndSelfSubmitCallback = new ScriptTextOutputCallback(
-                    clientSideScriptExecutorFunction);
-
-            HiddenValueCallback hiddenValueCallback = new HiddenValueCallback(CircleUtil.OUT_PARAMETER);
-            ImmutableList<Callback> callbacks = ImmutableList.of(scriptAndSelfSubmitCallback, hiddenValueCallback);
+            ImmutableList<Callback> callbacks = CircleUtil.getScriptAndSelfSubmitCallback(circleNodeScript);
 
             return send(callbacks).build();
         }

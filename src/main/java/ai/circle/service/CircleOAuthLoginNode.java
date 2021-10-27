@@ -13,12 +13,12 @@ import org.forgerock.openam.annotations.sm.Attribute;
 import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeProcessException;
+import org.forgerock.openam.auth.node.api.NodeState;
 import org.forgerock.openam.auth.node.api.TreeContext;
 import org.forgerock.util.i18n.PreferredLocales;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import ai.circle.CircleUtil;
+
 import com.google.common.collect.ImmutableList;
 import com.google.inject.assistedinject.Assisted;
 
@@ -36,9 +36,6 @@ import com.sun.identity.sm.RequiredValueValidator;
 public class CircleOAuthLoginNode implements Node {
     private final static String TRUE_OUTCOME_ID = "hasRefreshTokenTrue";
     private final static String FALSE_OUTCOME_ID = "hasRefreshTokenFalse";
-
-    //TODO Logging is never used
-    private final Logger logger = LoggerFactory.getLogger(CircleOAuthLoginNode.class);
     private static String userPassword = "";
     private static String userName = "";
 
@@ -101,9 +98,11 @@ public class CircleOAuthLoginNode implements Node {
         String clientID = config.clientID();
         String clientSecret = config.clientSecret();
 
-        if (!context.transientState.get("password").toString().isEmpty()) {
-            userPassword = context.transientState.get("password").toString();
-            userName = context.sharedState.get("username").toString();
+        NodeState newNodeState = context.getStateFor(this);
+
+        if (!newNodeState.get("password").toString().isEmpty()) {
+            userPassword = newNodeState.get("password").toString();
+            userName = newNodeState.get("username").toString();
         }
 
         // OAuth2 client authentication
@@ -118,23 +117,17 @@ public class CircleOAuthLoginNode implements Node {
         Map<String, String> tokens = CircleUtil.getForgeRockRefreshTokenFromAuthCode(autorizeCode, //
                 redirectUrl, clientID, clientSecret, refreshAccessTokenEndPoint);
 
-        JsonValue newSharedState = context.sharedState.copy();
-        newSharedState.put("refresh_token", tokens.get("refreshToken"));
-        newSharedState.put("access_token", tokens.get("accessToken"));
+        newNodeState.putShared("refresh_token", tokens.get("refreshToken"));
+        newNodeState.putShared("access_token", tokens.get("accessToken"));
+        newNodeState.putTransient("refresh_token", tokens.get("refreshToken"));
 
-        context.transientState.add("refresh_token", tokens.get("refreshToken"));
-
-        boolean returnState = false;
-
-        if (!tokens.get("refreshToken").isEmpty()) {
-            returnState = true;
-        }
-
-        return goTo(returnState).replaceSharedState(newSharedState).build();
+        String newRefreshToken = tokens.get("refreshToken").toString();
+        return goTo(newRefreshToken.isEmpty() ? false : true).build();
     }
 
     private Action.ActionBuilder goTo(boolean outcome) {
         return Action.goTo(outcome ? TRUE_OUTCOME_ID : FALSE_OUTCOME_ID);
+
     }
 
     static final class OutcomeProvider implements org.forgerock.openam.auth.node.api.OutcomeProvider {
@@ -147,4 +140,5 @@ public class CircleOAuthLoginNode implements Node {
                     new Outcome(FALSE_OUTCOME_ID, bundle.getString(FALSE_OUTCOME_ID)));
         }
     }
+
 }

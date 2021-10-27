@@ -14,6 +14,7 @@ import org.forgerock.openam.annotations.sm.Attribute;
 import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeProcessException;
+import org.forgerock.openam.auth.node.api.NodeState;
 import org.forgerock.openam.auth.node.api.TreeContext;
 import org.forgerock.util.i18n.PreferredLocales;
 import static org.forgerock.openam.auth.node.api.Action.send;
@@ -23,7 +24,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.assistedinject.Assisted;
 
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
-import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.sm.RequiredValueValidator;
 
 /**
@@ -64,11 +64,10 @@ public class CircleSaveTokenNode implements Node {
 
     @Override
     public Action process(TreeContext context) throws NodeProcessException {
+        NodeState newNodeState = context.getStateFor(this);
 
-        JsonValue newSharedState = context.sharedState.copy();
-
-        if (!context.transientState.get("refresh_token").toString().isEmpty()) {
-            refreshToken = context.transientState.get("refresh_token").toString();
+        if (!newNodeState.get("refresh_token").toString().isEmpty()) {
+            refreshToken = newNodeState.get("refresh_token").toString();
             refreshToken = refreshToken.replace("\"", "");
         }
 
@@ -76,18 +75,20 @@ public class CircleSaveTokenNode implements Node {
                 .filter(scriptOutput -> !Strings.isNullOrEmpty(scriptOutput));
 
         // check if there is a result of javascript
+
         if (result.isPresent()) {
             String resultString = result.get();
 
             return goTo(Boolean.parseBoolean(resultString)).build();
+
         } else {
             String circleNodeScript = "";
 
             try {
                 circleNodeScript = CircleUtil.CORE_SCRIPT;
 
-                String appKey = newSharedState.get("CircleAppKey").toString();
-                String appToken = newSharedState.get("CircleToken").toString();
+                String appKey = newNodeState.get("CircleAppKey").toString();
+                String appToken = newNodeState.get("CircleToken").toString();
 
                 if (appToken == null || appToken.equals("")) {
 
@@ -107,16 +108,10 @@ public class CircleSaveTokenNode implements Node {
                 circleNodeScript += "await autoSubmit();\n";
 
             } catch (Exception e) {
-                e.printStackTrace();
+
             }
 
-            String clientSideScriptExecutorFunction = CircleUtil.createClientSideScriptExecutorFunction(
-                    circleNodeScript, CircleUtil.OUT_PARAMETER, true, context.sharedState.toString());
-            ScriptTextOutputCallback scriptAndSelfSubmitCallback = new ScriptTextOutputCallback(
-                    clientSideScriptExecutorFunction);
-
-            HiddenValueCallback hiddenValueCallback = new HiddenValueCallback(CircleUtil.OUT_PARAMETER);
-            ImmutableList<Callback> callbacks = ImmutableList.of(scriptAndSelfSubmitCallback, hiddenValueCallback);
+            ImmutableList<Callback> callbacks = CircleUtil.getScriptAndSelfSubmitCallback(circleNodeScript);
 
             return send(callbacks).build();
         }
@@ -133,8 +128,8 @@ public class CircleSaveTokenNode implements Node {
         public List<Outcome> getOutcomes(PreferredLocales locales, JsonValue nodeAttributes) {
             ResourceBundle bundle = locales.getBundleInPreferredLocale(BUNDLE, OutcomeProvider.class.getClassLoader());
             return ImmutableList.of( //
-                    new Outcome(TRUE_OUTCOME_ID, bundle.getString("savedTrue")), //
-                    new Outcome(FALSE_OUTCOME_ID, bundle.getString("savedFalse")));//
+                    new Outcome(TRUE_OUTCOME_ID, bundle.getString(TRUE_OUTCOME_ID)), //
+                    new Outcome(FALSE_OUTCOME_ID, bundle.getString(FALSE_OUTCOME_ID)));//
         }
     }
 }

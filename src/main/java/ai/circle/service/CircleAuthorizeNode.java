@@ -17,6 +17,8 @@ import org.forgerock.json.JsonValue;
 import org.forgerock.openam.annotations.sm.Attribute;
 import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
+import org.forgerock.openam.auth.node.api.NodeProcessException;
+import org.forgerock.openam.auth.node.api.NodeState;
 import org.forgerock.openam.auth.node.api.TreeContext;
 import org.forgerock.util.i18n.PreferredLocales;
 import org.json.JSONObject;
@@ -25,11 +27,12 @@ import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.assistedinject.Assisted;
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
-import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.sm.RequiredValueValidator;
 
 import ai.circle.CircleUtil;
 import ai.circle.Crypto;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This node Authorizes the usage of the Circle Service by getting a Token from
@@ -45,7 +48,7 @@ public class CircleAuthorizeNode implements Node {
 
     private final static String TRUE_OUTCOME_ID = "authorizeTrue";
     private final static String FALSE_OUTCOME_ID = "authorizeFalse";
-    private final String scriptName = "/js/authorize.js";
+    private final static Logger logger = LoggerFactory.getLogger(CircleAuthorizeNode.class);
 
     public interface Config {
 
@@ -95,24 +98,28 @@ public class CircleAuthorizeNode implements Node {
         // check if there is a result of javascript
 
         if (result.isPresent()) {
-            JsonValue newSharedState = context.sharedState.copy();
+            NodeState newNodeState = context.getStateFor(this);
             String resultString = result.get();
 
-            newSharedState.put("CircleToken", tokenInstance);
-            newSharedState.put("CircleAppKey", config.appKey());
+            newNodeState.putShared("CircleToken", tokenInstance);
+            newNodeState.putShared("CircleAppKey", config.appKey());
 
             tokenInstance = "";
             boolean returnStatus = !resultString.isEmpty() && !resultString.equals(CircleUtil.OUT_PARAMETER);
 
-            return goTo(returnStatus).replaceSharedState(newSharedState).build();
+            return goTo(returnStatus).build();
         } else {
-
+            String scriptName = "/js/authorize.js";
             String apiUrl = config.apiUrl();
             String customerCode = config.customerCode();
             String appKey = config.appKey();
 
             if (tokenInstance.equals("")) {
-                tokenInstance = getToken(customerCode, appKey, apiUrl);
+                try {
+                    tokenInstance = getToken(customerCode, appKey, apiUrl);
+                } catch (NodeProcessException e) {
+                    logger.error("Error getting Circle Token ", e);
+                }
             }
 
             if (tokenInstance == null || tokenInstance.equals("")) {
@@ -129,20 +136,13 @@ public class CircleAuthorizeNode implements Node {
             circleNodeScript += "await autoSubmit();\n";
             circleNodeScript += "output.value = isAuthorized;\n";
 
-            //TODO Duplicated code
-            String clientSideScriptExecutorFunction = CircleUtil.createClientSideScriptExecutorFunction(
-                    circleNodeScript, CircleUtil.OUT_PARAMETER, true, context.sharedState.toString());
-            ScriptTextOutputCallback scriptAndSelfSubmitCallback = new ScriptTextOutputCallback(
-                    clientSideScriptExecutorFunction);
-
-            HiddenValueCallback hiddenValueCallback = new HiddenValueCallback(CircleUtil.OUT_PARAMETER);
-            ImmutableList<Callback> callbacks = ImmutableList.of(scriptAndSelfSubmitCallback, hiddenValueCallback);
+            ImmutableList<Callback> callbacks = CircleUtil.getScriptAndSelfSubmitCallback(circleNodeScript);
 
             return send(callbacks).build();
         }
     }
 
-    private String getToken(String customerCode, String appKey, String apiUrl) {
+    private String getToken(String customerCode, String appKey, String apiUrl) throws NodeProcessException {
 
         try {
             Random rndGen = new Random();
@@ -178,9 +178,9 @@ public class CircleAuthorizeNode implements Node {
                 return token;
             }
 
-            //TODO Instead of printing the stack trace, the error should be logged and either a NodeProcessException should be thrown, or the error should be handled
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error getting the Circle Token from Circle API", e);
+            throw new NodeProcessException(e);
         }
 
         return null;

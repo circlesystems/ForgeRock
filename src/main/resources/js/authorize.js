@@ -195,9 +195,11 @@ async function checkUserIsLocked(CircleId) {
 }
 
 async function getCircleAndTopic() {
+  const isAuthorizedNode = await Circle.authorize();
 
   const allCircles = await Circle.enumCircles();
   if (!allCircles || !allCircles.Status.Result || !allCircles.CircleMeta || !allCircles.CircleMeta.length) {
+    console.log(allCircles);
     console.log("Cant retrieve Circle");
     return null;
   }
@@ -292,6 +294,8 @@ async function getCircleDecryptData(ToDecrypt) {
 }
 
 async function saveTokenToCircle(tokenType, tokenData) {
+  const isAuthorizedNode = await Circle.authorize();
+  console.log("isAuthorizedNode: " + isAuthorizedNode);
 
   const circleTopicData = await getCircleAndTopic();
   if (!circleTopicData) {

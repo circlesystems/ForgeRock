@@ -15,9 +15,13 @@ import org.forgerock.openam.annotations.sm.Attribute;
 import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeProcessException;
+import org.forgerock.openam.auth.node.api.NodeState;
 import org.forgerock.openam.auth.node.api.TreeContext;
 
 import org.forgerock.util.i18n.PreferredLocales;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import ai.circle.CircleUtil;
 
 import com.google.common.collect.ImmutableList;
@@ -36,9 +40,9 @@ import com.sun.identity.sm.RequiredValueValidator;
         tags = { "basic authentication" }//
 )
 public class CircleExchangeRefreshToken implements Node {
-    private final static String TRUE_OUTCOME_ID = "refreshToken";
-    //TODO Field is never used
-    private final static String FALSE_OUTCOME_ID = "acessToken";
+    private final static String TRUE_OUTCOME_ID = "refreshTokenTrue";
+    private final static String FALSE_OUTCOME_ID = "refreshTokenFalse";
+    private final Logger logger = LoggerFactory.getLogger(CircleExchangeRefreshToken.class);
 
     /**
      * Configuration for the node.
@@ -77,36 +81,35 @@ public class CircleExchangeRefreshToken implements Node {
     }
 
     @Override
-    public Action process(TreeContext context) {
+    public Action process(TreeContext context) throws NodeProcessException {
+
         try {
             String clientSecret = config.clientSecret();
             String refreshAccessTokenEndPoint = config.accessTokenEndpoint();
             String clientID = config.clientID();
 
-            String refreshToken = context.transientState.get("refresh_token").toString();
+            NodeState newNodeState = context.getStateFor(this);
+            String refreshToken = newNodeState.get("refresh_token").toString();
             refreshToken = refreshToken.replace("\"", "");
 
             HashMap<String, String> newAccessRefreshTokens = CircleUtil.getForgeRockAccessTokenFromRefreshToken(
                     clientID, clientSecret, refreshToken, refreshAccessTokenEndPoint);
 
-            context.transientState.remove("refresh_token");
-            context.transientState.remove("access_token");
+            newNodeState.putTransient("refresh_token", newAccessRefreshTokens.get("refreshToken").toString());
+            newNodeState.putTransient("acess_token", newAccessRefreshTokens.get("accessToken").toString());
 
-            context.transientState.add("refresh_token", newAccessRefreshTokens.get("refreshToken").toString());
-            context.transientState.add("acess_token", newAccessRefreshTokens.get("accessToken").toString());
-
-            boolean returnStatus = !newAccessRefreshTokens.get("refreshToken").isEmpty();
+            boolean returnStatus = (newAccessRefreshTokens.get("accessToken").toString().isEmpty()) ? false : true;
             return goTo(returnStatus).build();
 
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error getting the refresh token (CircleExchangeRefreshToken)", e);
+            throw new NodeProcessException(e);
         }
-        return null;
+
     }
 
-    //TODO Outcome is never used
     private Action.ActionBuilder goTo(boolean outcome) {
-        return Action.goTo("refreshToken");
+        return Action.goTo(outcome ? TRUE_OUTCOME_ID : FALSE_OUTCOME_ID);
     }
 
     static final class OutcomeProvider implements org.forgerock.openam.auth.node.api.OutcomeProvider {
@@ -116,7 +119,8 @@ public class CircleExchangeRefreshToken implements Node {
         public List<Outcome> getOutcomes(PreferredLocales locales, JsonValue nodeAttributes) {
             ResourceBundle bundle = locales.getBundleInPreferredLocale(BUNDLE, OutcomeProvider.class.getClassLoader());
             return ImmutableList.of( //
-                    new Outcome(TRUE_OUTCOME_ID, bundle.getString("refreshToken")));
+                    new Outcome(TRUE_OUTCOME_ID, bundle.getString(TRUE_OUTCOME_ID)), //
+                    new Outcome(FALSE_OUTCOME_ID, bundle.getString(FALSE_OUTCOME_ID))); //
         }
     }
 }

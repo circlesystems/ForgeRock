@@ -12,13 +12,12 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
-import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
+
+import javax.security.auth.callback.Callback;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
@@ -28,9 +27,16 @@ import org.apache.http.client.methods.HttpPost;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.util.EntityUtils;
+import org.forgerock.openam.auth.node.api.NodeProcessException;
+
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import com.google.common.collect.ImmutableList;
+
+import com.sun.identity.authentication.callbacks.HiddenValueCallback;
+import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 
 public class CircleUtil {
     public final static String OUT_PARAMETER = "circleJsResult";
@@ -46,31 +52,15 @@ public class CircleUtil {
      * @throws IOException file does not exist or cannot read the content
      */
 
-    //TODO Method never used
-    public static String readFileAsString(String fileName) throws IOException {
-        String text;
-        try {
-            text = new String(Files.readAllBytes(Paths.get(fileName)));
-        } catch (IOException e) {
-            throw new IOException("Cant read file " + fileName);
-        }
-        return text;
-    }
-
     public static String readFileString(String path) {
         try {
             InputStream in = Thread.currentThread().getContextClassLoader().getResourceAsStream(path);
             String data = readAllLines(in);
-            //TODO Close may return a null pointer. Need to handle that
             in.close();
             return data;
-        } catch (Exception e) {
-
+        } catch (NullPointerException | IOException e) {
             logger.error("Can´t read file " + path, e);
             return null;
-        } finally {
-            //TODO Nothing in finally block?
-
         }
     }
 
@@ -79,8 +69,20 @@ public class CircleUtil {
         return reader.lines().parallel().collect(Collectors.joining("\n"));
     }
 
+    public static ImmutableList<Callback> getScriptAndSelfSubmitCallback(String circleNodeScript) {
+        String clientSideScriptExecutorFunction = CircleUtil.createClientSideScriptExecutorFunction(circleNodeScript,
+                CircleUtil.OUT_PARAMETER, true);
+
+        ScriptTextOutputCallback scriptAndSelfSubmitCallback = new ScriptTextOutputCallback(
+                clientSideScriptExecutorFunction);
+
+        HiddenValueCallback hiddenValueCallback = new HiddenValueCallback(CircleUtil.OUT_PARAMETER);
+        return ImmutableList.of(scriptAndSelfSubmitCallback, hiddenValueCallback);
+
+    }
+
     public static String createClientSideScriptExecutorFunction(String script, String outputParameterId,
-            boolean clientSideScriptEnabled, String context) {
+            boolean clientSideScriptEnabled) {
         String collectingDataMessage = "";
 
         if (clientSideScriptEnabled) {
@@ -97,7 +99,7 @@ public class CircleUtil {
         return String.format(browserScript + "(async function (output) {\n"//
                 + "    var autoSubmitDelay = 0,\n"//
                 + "        submitted = false,\n"//
-                + "        context = %s;\n"//
+                + "        context = {};\n"//
                 + "    function submit() {\n"//
                 + "        if (submitted) {\n"//
                 + "            return;\n" //
@@ -108,12 +110,12 @@ public class CircleUtil {
                 + "          $('input[type=submit]').click();\n"//
                 + "        }\n" //
                 + "        submitted = true;\n"//
-                + "    }\n"//
+                + "    }\n"// ''
                 + "%s \n" // script
                 + " async function autoSubmit() {\n"//
                 + "    setTimeout(submit, autoSubmitDelay);\n" //
                 + "    }\n" + "}) (document.forms[0].elements['%s']);\n", //
-                context, script, outputParameterId);
+                script, outputParameterId);
     }
 
     public static String authorizeForAuthenticationCode(String authId, String endPoint, String redirectURL,
@@ -178,19 +180,6 @@ public class CircleUtil {
         return null;
     }
 
-    //TODO Method never used
-    public static Map<String, String> getQueryMap(String query) {
-        String[] params = query.split("&");
-        Map<String, String> map = new HashMap<>();
-
-        for (String param : params) {
-            String name = param.split("=")[0];
-            String value = param.split("=")[1];
-            map.put(name, value);
-        }
-        return map;
-    }
-
     public static String authenticateWithUsernamePassword(String userName, String userPassword, String endPoint) {
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost post = new HttpPost(endPoint);
@@ -209,11 +198,10 @@ public class CircleUtil {
             e.printStackTrace();
             return "";
         }
-
     }
 
     public static HashMap<String, String> getForgeRockRefreshTokenFromAuthCode(String code, String redirectUrl,
-            String clientId, String clientSecret, String endPoint) {
+            String clientId, String clientSecret, String endPoint) throws NodeProcessException {
         try {
 
             HttpClient client = HttpClientBuilder.create().build();
@@ -228,7 +216,6 @@ public class CircleUtil {
             params.add(new BasicNameValuePair("grant_type", "authorization_code"));
             params.add(new BasicNameValuePair("redirect_uri", redirectUrl));
 
-            //TODO Duplicated code
             post.setEntity(new UrlEncodedFormEntity(params));
 
             HttpResponse response = client.execute(post);
@@ -245,11 +232,9 @@ public class CircleUtil {
             return ret;
 
         } catch (Exception e) {
-
-            //TODO Handle exception with logger and NodeProcessException
-            e.printStackTrace();
+            logger.error("Error getting the ForgeRock Refresh Token From AuthCode", e);
+            throw new NodeProcessException(e);
         }
-        return null;
     }
 
     public static HashMap<String, String> getForgeRockAccessTokenFromRefreshToken(String clientId, String clientSecret,
@@ -266,7 +251,7 @@ public class CircleUtil {
             params.add(new BasicNameValuePair("client_secret", clientSecret));
             params.add(new BasicNameValuePair("refresh_token", refreshToken));
             params.add(new BasicNameValuePair("grant_type", "refresh_token"));
-            //TODO Duplicated code
+
             post.setEntity(new UrlEncodedFormEntity(params));
 
             HttpResponse response = client.execute(post);
@@ -274,6 +259,7 @@ public class CircleUtil {
             String json = EntityUtils.toString(response.getEntity());
 
             JSONObject jret = new JSONObject(json);
+
             String newRefreshToken = jret.getString("refresh_token");
             String newAccessToken = jret.getString("access_token");
 
@@ -283,8 +269,8 @@ public class CircleUtil {
             return ret;
 
         } catch (Exception e) {
+            logger.error("Error getting the ForgeRock Access Token From Refresh Token", e);
 
-            e.printStackTrace();
         }
         return null;
     }

@@ -7,8 +7,11 @@ import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
 
 import com.google.api.client.util.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class Crypto {
+    private final static Logger logger = LoggerFactory.getLogger(Crypto.class);
 
     public static String hmac_sha256(String secretKey, String data) {
         try {
@@ -18,8 +21,8 @@ public class Crypto {
 
             return (Base64.encodeBase64String(sha256_HMAC.doFinal(data.getBytes())));
         } catch (Exception e) {
-            //TODO Handle exception with logger and NodeProcessException
-            return e.getMessage();
+            logger.error("Error generating hmac_sha256", e);
+            return null;
         }
 
     }

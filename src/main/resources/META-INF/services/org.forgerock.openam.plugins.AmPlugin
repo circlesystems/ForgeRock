@@ -1,16 +1,4 @@
 #
 # Copyright 2021 Circle
 #
-
-#ai.circle.service.CircleRunningNodePlugin
-#ai.circle.service.CircleAuthorizeNodePlugin
-#ai.circle.service.CircleVerifyTokenExistenceNodePlugin
-#ai.circle.service.CircleSaveTokenNodePlugin
-#ai.circle.service.CircleOAuthLoginNodePlugin
-#ai.circle.service.CircleExchangeRefreshTokenPlugin
-#ai.circle.service.CircleLockUserNodePlugin
-#ai.circle.service.CircleOTPCollectorNodePlugin
-#ai.circle.service.CircleOTPCodesNodePlugin
-#ai.circle.service.CircleUnlockUserNodePlugin
-
 ai.circle.service.CircleAuthTreeNodesPlugin

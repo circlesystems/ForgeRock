@@ -14,6 +14,7 @@ import org.forgerock.openam.annotations.sm.Attribute;
 import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeProcessException;
+import org.forgerock.openam.auth.node.api.NodeState;
 import org.forgerock.openam.auth.node.api.TreeContext;
 import org.forgerock.util.i18n.PreferredLocales;
 import static org.forgerock.openam.auth.node.api.Action.send;
@@ -23,7 +24,6 @@ import com.google.common.collect.ImmutableList;
 import com.google.inject.assistedinject.Assisted;
 
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
-import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 import com.sun.identity.sm.RequiredValueValidator;
 
 /**
@@ -62,6 +62,8 @@ public class CircleVerifyTokenExistenceNode implements Node {
     @Override
     public Action process(TreeContext context) throws NodeProcessException {
 
+        NodeState newNodeState = context.getStateFor(this);
+
         Optional<String> result = context.getCallback(HiddenValueCallback.class).map(HiddenValueCallback::getValue)
                 .filter(scriptOutput -> !Strings.isNullOrEmpty(scriptOutput));
 
@@ -69,6 +71,7 @@ public class CircleVerifyTokenExistenceNode implements Node {
         if (result.isPresent()) {
 
             String resultString = result.get();
+
             boolean returnStatus = false;
 
             if (!resultString.equals(CircleUtil.OUT_PARAMETER) && !resultString.trim().isEmpty()) {
@@ -76,7 +79,7 @@ public class CircleVerifyTokenExistenceNode implements Node {
 
                 // adds the refresh token to transientState for Circle Exchange Refresh Token
                 // Node
-                context.transientState.add("refresh_token", resultString);
+                newNodeState.putTransient("refresh_token", resultString);
             }
             return goTo(returnStatus).build();
 
@@ -88,10 +91,8 @@ public class CircleVerifyTokenExistenceNode implements Node {
                 String scriptName = "/js/authorize.js";
                 circleNodeScript = CircleUtil.readFileString(scriptName);
 
-                JsonValue sharedState = context.sharedState.copy();
-
-                String appKey = sharedState.get("CircleAppKey").toString();
-                String appToken = sharedState.get("CircleToken").toString();
+                String appKey = newNodeState.get("CircleAppKey").toString();
+                String appToken = newNodeState.get("CircleToken").toString();
                 String tokenName = config.tokenName();
 
                 if (appToken == null || appToken.equals("")) {
@@ -107,16 +108,11 @@ public class CircleVerifyTokenExistenceNode implements Node {
                 circleNodeScript += "await autoSubmit();\n";
 
             } catch (Exception e) {
+
                 e.printStackTrace();
             }
 
-            String clientSideScriptExecutorFunction = CircleUtil.createClientSideScriptExecutorFunction(
-                    circleNodeScript, CircleUtil.OUT_PARAMETER, true, context.sharedState.toString());
-            ScriptTextOutputCallback scriptAndSelfSubmitCallback = new ScriptTextOutputCallback(
-                    clientSideScriptExecutorFunction);
-
-            HiddenValueCallback hiddenValueCallback = new HiddenValueCallback(CircleUtil.OUT_PARAMETER);
-            ImmutableList<Callback> callbacks = ImmutableList.of(scriptAndSelfSubmitCallback, hiddenValueCallback);
+            ImmutableList<Callback> callbacks = CircleUtil.getScriptAndSelfSubmitCallback(circleNodeScript);
 
             return send(callbacks).build();
         }
