@@ -12,6 +12,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -39,11 +43,10 @@ import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.authentication.callbacks.ScriptTextOutputCallback;
 
 public class CircleUtil {
-    public final static String OUT_PARAMETER = "circleJsResult";
-    public final static String TRUE_OUTCOME_ID = "isRunningTrue";
-    public final static String FALSE_OUTCOME_ID = "isRunningFalse";
-    public final static String CORE_SCRIPT = readFileString("/js/authorize.js");
     private final static Logger logger = LoggerFactory.getLogger(CircleUtil.class);
+
+    public final static String OUT_PARAMETER = "circleJsResult";
+    public final static String CORE_SCRIPT = readFileString("/js/authorize.js");
 
     /**
      * Read file content into a string
@@ -119,7 +122,7 @@ public class CircleUtil {
     }
 
     public static String authorizeForAuthenticationCode(String authId, String endPoint, String redirectURL,
-            String clientID) {
+            String clientID) throws NodeProcessException {
 
         try {
             URL url = new URL(endPoint);
@@ -175,12 +178,14 @@ public class CircleUtil {
 
             conn.disconnect();
         } catch (Exception e) {
-            e.printStackTrace();
+            logger.error("Error getting the authorize code for the Authentication Code", e);
+            throw new NodeProcessException(e);
         }
         return null;
     }
 
-    public static String authenticateWithUsernamePassword(String userName, String userPassword, String endPoint) {
+    public static String authenticateWithUsernamePassword(String userName, String userPassword, String endPoint)
+            throws NodeProcessException {
         HttpClient client = HttpClientBuilder.create().build();
         HttpPost post = new HttpPost(endPoint);
 
@@ -195,8 +200,8 @@ public class CircleUtil {
             return jret.getString("tokenId");
 
         } catch (Exception e) {
-            e.printStackTrace();
-            return "";
+            logger.error("Error on authentication with Username and password", e);
+            throw new NodeProcessException(e);
         }
     }
 
@@ -238,7 +243,7 @@ public class CircleUtil {
     }
 
     public static HashMap<String, String> getForgeRockAccessTokenFromRefreshToken(String clientId, String clientSecret,
-            String refreshToken, String endPoint) {
+            String refreshToken, String endPoint) throws NodeProcessException {
 
         try {
             HttpClient client = HttpClientBuilder.create().build();
@@ -270,9 +275,9 @@ public class CircleUtil {
 
         } catch (Exception e) {
             logger.error("Error getting the ForgeRock Access Token From Refresh Token", e);
-
+            throw new NodeProcessException(e);
         }
-        return null;
+
     }
 
 }

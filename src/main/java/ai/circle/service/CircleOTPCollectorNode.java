@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.inject.Inject;
 import javax.security.auth.callback.NameCallback;
+import static org.forgerock.openam.auth.node.api.Action.send;
 
 import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
@@ -12,7 +13,6 @@ import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.forgerock.openam.auth.node.api.NodeState;
 import org.forgerock.openam.auth.node.api.SingleOutcomeNode;
 import org.forgerock.openam.auth.node.api.TreeContext;
-import static org.forgerock.openam.auth.node.api.Action.send;
 
 /**
  * This node collects the unlock codes and stores in sharedState.

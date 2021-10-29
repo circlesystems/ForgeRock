@@ -46,7 +46,8 @@ import ai.circle.RSAUtil;
         tags = { "basic authentication" }//
 )
 public class CircleLockUserNode implements Node {
-    private final static Logger logger = LoggerFactory.getLogger(CircleUtil.class);
+    private final static Logger logger = LoggerFactory.getLogger(CircleLockUserNode.class);
+
     public final static String TRUE_OUTCOME_ID = "lockedTrue";
     public final static String FALSE_OUTCOME_ID = "lockedFalse";
 
@@ -114,7 +115,9 @@ public class CircleLockUserNode implements Node {
                     return goTo(decryptedCode1.isEmpty() ? false : true).build();
 
                 } catch (JSONException e) {
+
                     logger.error("Error parsing JSON", e);
+                    throw new NodeProcessException(e);
                 }
             }
 

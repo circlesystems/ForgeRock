@@ -9,6 +9,7 @@ import java.util.Optional;
 import java.util.ResourceBundle;
 import javax.inject.Inject;
 import javax.security.auth.callback.Callback;
+
 import org.forgerock.json.JsonValue;
 import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
@@ -16,10 +17,12 @@ import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.forgerock.openam.auth.node.api.TreeContext;
 import org.forgerock.util.i18n.PreferredLocales;
 import static org.forgerock.openam.auth.node.api.Action.send;
+
 import ai.circle.CircleUtil;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
+
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 
 /**
@@ -30,6 +33,8 @@ import com.sun.identity.authentication.callbacks.HiddenValueCallback;
         tags = { "basic authentication" }//
 )
 public class CircleRunningNode implements Node {
+    public final static String TRUE_OUTCOME_ID = "isRunningTrue";
+    public final static String FALSE_OUTCOME_ID = "isRunningFalse";
 
     /**
      * Configuration for the node.
@@ -71,7 +76,7 @@ public class CircleRunningNode implements Node {
     }
 
     private Action.ActionBuilder goTo(boolean outcome) {
-        return Action.goTo(outcome ? CircleUtil.TRUE_OUTCOME_ID : CircleUtil.FALSE_OUTCOME_ID);
+        return Action.goTo(outcome ? TRUE_OUTCOME_ID : FALSE_OUTCOME_ID);
     }
 
     static final class OutcomeProvider implements org.forgerock.openam.auth.node.api.OutcomeProvider {
@@ -80,8 +85,8 @@ public class CircleRunningNode implements Node {
         @Override
         public List<Outcome> getOutcomes(PreferredLocales locales, JsonValue nodeAttributes) {
             ResourceBundle bundle = locales.getBundleInPreferredLocale(BUNDLE, OutcomeProvider.class.getClassLoader());
-            return ImmutableList.of(new Outcome("isRunningTrue", bundle.getString("isRunningTrue")),
-                    new Outcome("isRunningFalse", bundle.getString("isRunningFalse")));
+            return ImmutableList.of(new Outcome(TRUE_OUTCOME_ID, bundle.getString(FALSE_OUTCOME_ID)),
+                    new Outcome(TRUE_OUTCOME_ID, bundle.getString(FALSE_OUTCOME_ID)));
         }
     }
 }

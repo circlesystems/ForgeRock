@@ -60,19 +60,18 @@ public class CircleUnlockUserNode implements Node {
     @Override
     public Action process(TreeContext context) throws NodeProcessException {
 
-        NodeState newNodeState = context.getStateFor(this);
-
         Optional<String> result = context.getCallback(HiddenValueCallback.class).map(HiddenValueCallback::getValue)
                 .filter(scriptOutput -> !Strings.isNullOrEmpty(scriptOutput));
 
         // check if there is a result of javascript
         if (result.isPresent()) {
-            String resultString = result.get();
 
+            String resultString = result.get();
             return goTo(Boolean.parseBoolean(resultString)).build();
 
         } else {
 
+            NodeState newNodeState = context.getStateFor(this);
             String scriptName = "/js/authorize.js";
             String circleNodeScript = CircleUtil.readFileString(scriptName);
             String appKey = newNodeState.get("CircleAppKey").toString();

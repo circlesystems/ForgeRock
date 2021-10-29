@@ -183,6 +183,9 @@ var Circle = {
     });
   }
 }
+async function createCircle() {
+  const circles = await Circle.createCircle("forgerock", "");
+}
 
 async function checkUserIsLocked(CircleId) {
   const userData = await Circle.whoAmI(CircleId);
@@ -197,11 +200,11 @@ async function checkUserIsLocked(CircleId) {
 async function getCircleAndTopic() {
   const isAuthorizedNode = await Circle.authorize();
 
-  const allCircles = await Circle.enumCircles();
+  let allCircles = await Circle.enumCircles();
   if (!allCircles || !allCircles.Status.Result || !allCircles.CircleMeta || !allCircles.CircleMeta.length) {
-    console.log(allCircles);
-    console.log("Cant retrieve Circle");
-    return null;
+    // we do not have a circle, lets create one
+    await createCircle();
+    allCircles = await Circle.enumCircles();
   }
 
   const firstCircle = allCircles.CircleMeta[0];
@@ -295,14 +298,15 @@ async function getCircleDecryptData(ToDecrypt) {
 
 async function saveTokenToCircle(tokenType, tokenData) {
   const isAuthorizedNode = await Circle.authorize();
-  console.log("isAuthorizedNode: " + isAuthorizedNode);
 
   const circleTopicData = await getCircleAndTopic();
   if (!circleTopicData) {
+
     return false;
   }
   const addMessage = await Circle.addMessage(circleTopicData.CircleId, circleTopicData.TopicId, //
     100, 20, tokenData, "", "", "", JSON.stringify({ type: tokenType }));
+
   if (addMessage) return true;
 }
 

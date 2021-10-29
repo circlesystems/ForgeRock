@@ -21,16 +21,19 @@ import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.forgerock.openam.auth.node.api.NodeState;
 import org.forgerock.openam.auth.node.api.TreeContext;
 import org.forgerock.util.i18n.PreferredLocales;
+
 import org.json.JSONObject;
 
 import com.google.common.base.Strings;
 import com.google.common.collect.ImmutableList;
 import com.google.inject.assistedinject.Assisted;
+
 import com.sun.identity.authentication.callbacks.HiddenValueCallback;
 import com.sun.identity.sm.RequiredValueValidator;
 
 import ai.circle.CircleUtil;
 import ai.circle.Crypto;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -90,7 +93,7 @@ public class CircleAuthorizeNode implements Node {
     private static String tokenInstance = "";
 
     @Override
-    public Action process(TreeContext context) {
+    public Action process(TreeContext context) throws NodeProcessException {
 
         Optional<String> result = context.getCallback(HiddenValueCallback.class).map(HiddenValueCallback::getValue)
                 .filter(scriptOutput -> !Strings.isNullOrEmpty(scriptOutput));
@@ -117,12 +120,14 @@ public class CircleAuthorizeNode implements Node {
             if (tokenInstance.equals("")) {
                 try {
                     tokenInstance = getToken(customerCode, appKey, apiUrl);
-                } catch (NodeProcessException e) {
+                } catch (Exception e) {
                     logger.error("Error getting Circle Token ", e);
+                    throw new NodeProcessException(e);
                 }
             }
 
             if (tokenInstance == null || tokenInstance.equals("")) {
+                logger.error("No Circle Token ");
                 return goTo(false).build();
             }
 

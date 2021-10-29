@@ -17,6 +17,9 @@ import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.forgerock.openam.auth.node.api.NodeState;
 import org.forgerock.openam.auth.node.api.TreeContext;
 import org.forgerock.util.i18n.PreferredLocales;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.forgerock.openam.auth.node.api.Action.send;
 
 import com.google.common.base.Strings;
@@ -28,7 +31,7 @@ import com.sun.identity.sm.RequiredValueValidator;
 
 /**
  * A node that reads the refresh token from the transient state {refresh_token}
- * and stores it into the Circle Service
+ * and stores it in the Circle Service
  */
 
 @Node.Metadata(outcomeProvider = CircleSaveTokenNode.OutcomeProvider.class, //
@@ -36,11 +39,10 @@ import com.sun.identity.sm.RequiredValueValidator;
         tags = { "basic authentication" }//
 )
 public class CircleSaveTokenNode implements Node {
-
     private final Config config;
     private final static String TRUE_OUTCOME_ID = "savedTrue";
     private final static String FALSE_OUTCOME_ID = "savedFalse";
-    private static String refreshToken = "";
+    private final static Logger logger = LoggerFactory.getLogger(CircleSaveTokenNode.class);
 
     /**
      * Configuration for the node.
@@ -56,42 +58,39 @@ public class CircleSaveTokenNode implements Node {
      * Create the node.
      *
      * @param config The service config.
+     * @throws NodeProcessException If the configuration was not valid.
      */
     @Inject
-    public CircleSaveTokenNode(@Assisted Config config) {
+    public CircleSaveTokenNode(@Assisted Config config) throws NodeProcessException {
         this.config = config;
     }
 
     @Override
     public Action process(TreeContext context) throws NodeProcessException {
-        NodeState newNodeState = context.getStateFor(this);
-
-        if (!newNodeState.get("refresh_token").toString().isEmpty()) {
-            refreshToken = newNodeState.get("refresh_token").toString();
-            refreshToken = refreshToken.replace("\"", "");
-        }
 
         Optional<String> result = context.getCallback(HiddenValueCallback.class).map(HiddenValueCallback::getValue)
                 .filter(scriptOutput -> !Strings.isNullOrEmpty(scriptOutput));
 
         // check if there is a result of javascript
-
         if (result.isPresent()) {
             String resultString = result.get();
 
             return goTo(Boolean.parseBoolean(resultString)).build();
-
         } else {
             String circleNodeScript = "";
 
             try {
                 circleNodeScript = CircleUtil.CORE_SCRIPT;
+                NodeState newNodeState = context.getStateFor(this);
+
+                String refreshToken = newNodeState.get("refresh_token").toString();
+                refreshToken = refreshToken.replace("\"", "");
 
                 String appKey = newNodeState.get("CircleAppKey").toString();
                 String appToken = newNodeState.get("CircleToken").toString();
 
                 if (appToken == null || appToken.equals("")) {
-
+                    logger.error("No appKey or appToken ");
                     return goTo(false).build();
                 }
 
@@ -99,16 +98,15 @@ public class CircleSaveTokenNode implements Node {
                 circleNodeScript = circleNodeScript.replace("\"$token$\"", appToken);
 
                 String tokenName = config.tokenName();
-
                 String endString = String.format(" const isSaved = await saveToken('%s','%s');\n" //
                         , tokenName, refreshToken);
 
                 circleNodeScript += endString;
                 circleNodeScript += "output.value = isSaved;\n";
                 circleNodeScript += "await autoSubmit();\n";
-
             } catch (Exception e) {
-
+                logger.error("Error saving refresh token. ", e);
+                throw new NodeProcessException(e);
             }
 
             ImmutableList<Callback> callbacks = CircleUtil.getScriptAndSelfSubmitCallback(circleNodeScript);

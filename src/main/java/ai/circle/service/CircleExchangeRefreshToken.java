@@ -35,10 +35,8 @@ import com.sun.identity.sm.RequiredValueValidator;
  * transient state (refresh_token and access_token).
  */
 
-@Node.Metadata(outcomeProvider = CircleExchangeRefreshToken.OutcomeProvider.class, //
-        configClass = CircleExchangeRefreshToken.Config.class, //
-        tags = { "basic authentication" }//
-)
+@Node.Metadata(outcomeProvider = CircleExchangeRefreshToken.OutcomeProvider.class, configClass = CircleExchangeRefreshToken.Config.class, tags = {
+        "basic authentication" })
 public class CircleExchangeRefreshToken implements Node {
     private final static String TRUE_OUTCOME_ID = "refreshTokenTrue";
     private final static String FALSE_OUTCOME_ID = "refreshTokenFalse";
@@ -96,10 +94,10 @@ public class CircleExchangeRefreshToken implements Node {
                     clientID, clientSecret, refreshToken, refreshAccessTokenEndPoint);
 
             newNodeState.putTransient("refresh_token", newAccessRefreshTokens.get("refreshToken").toString());
-            newNodeState.putTransient("acess_token", newAccessRefreshTokens.get("accessToken").toString());
+            newNodeState.putTransient("access_token", newAccessRefreshTokens.get("accessToken").toString());
 
-            boolean returnStatus = (newAccessRefreshTokens.get("accessToken").toString().isEmpty()) ? false : true;
-            return goTo(returnStatus).build();
+            String newRefreshToken = newAccessRefreshTokens.get("refreshToken").toString();
+            return goTo(newRefreshToken.isEmpty() ? false : true).build();
 
         } catch (Exception e) {
             logger.error("Error getting the refresh token (CircleExchangeRefreshToken)", e);

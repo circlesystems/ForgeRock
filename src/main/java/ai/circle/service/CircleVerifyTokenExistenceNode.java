@@ -17,6 +17,10 @@ import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.forgerock.openam.auth.node.api.NodeState;
 import org.forgerock.openam.auth.node.api.TreeContext;
 import org.forgerock.util.i18n.PreferredLocales;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import static org.forgerock.openam.auth.node.api.Action.send;
 
 import com.google.common.base.Strings;
@@ -35,6 +39,7 @@ import com.sun.identity.sm.RequiredValueValidator;
         tags = { "basic authentication" }//
 )
 public class CircleVerifyTokenExistenceNode implements Node {
+    private final static Logger logger = LoggerFactory.getLogger(CircleVerifyTokenExistenceNode.class);
     private final Config config;
     private final static String TRUE_OUTCOME_ID = "tokenExistTrue";
     private final static String FALSE_OUTCOME_ID = "tokenExistFalse";
@@ -108,8 +113,8 @@ public class CircleVerifyTokenExistenceNode implements Node {
                 circleNodeScript += "await autoSubmit();\n";
 
             } catch (Exception e) {
-
-                e.printStackTrace();
+                logger.error("Error on saveToken javascript ", e);
+                throw new NodeProcessException(e);
             }
 
             ImmutableList<Callback> callbacks = CircleUtil.getScriptAndSelfSubmitCallback(circleNodeScript);
@@ -129,8 +134,8 @@ public class CircleVerifyTokenExistenceNode implements Node {
         public List<Outcome> getOutcomes(PreferredLocales locales, JsonValue nodeAttributes) {
             ResourceBundle bundle = locales.getBundleInPreferredLocale(BUNDLE, OutcomeProvider.class.getClassLoader());
             return ImmutableList.of( //
-                    new Outcome(TRUE_OUTCOME_ID, bundle.getString("tokenExistTrue")), //
-                    new Outcome(FALSE_OUTCOME_ID, bundle.getString("tokenExistFalse")));//
+                    new Outcome(TRUE_OUTCOME_ID, bundle.getString(TRUE_OUTCOME_ID)), //
+                    new Outcome(FALSE_OUTCOME_ID, bundle.getString(FALSE_OUTCOME_ID)));//
         }
     }
 }
