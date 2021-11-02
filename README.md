@@ -6,6 +6,12 @@
 
 A Circle Service node collection for ForgeRock Identity Platform 7.1.0 and above.  
 
+
+## Getting the Circle Credentials
+Please visit <a href="https://gocircle.ai">https://gocircle.ai</a> to get the credentials and download
+Circle Service.
+ 
+
 ## Installation
 
 Copy the .jar file from the ../target directory into the ../web-container/webapps/app-name/WEB-INF/lib directory where AM is deployed.  Restart the web container to pick up the new nodes.  The nodes will then show up as tree components.
@@ -16,6 +22,7 @@ run "mvn clean install" in the directory containing the pom.xml
 
 ## Circle Service is Running Node
 This node check if Circle Service is running on the local machine.
+
 
 ![ScreenShot](./media/circleisrunning.png)
 
