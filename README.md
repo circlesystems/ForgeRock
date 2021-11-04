@@ -23,6 +23,8 @@ run "mvn clean install" in the directory containing the pom.xml
 ## Circle Service is Running Node
 This node check if Circle Service is running on the local machine.
 
+<strong>Note:</strong> the <strong>[Installers URL]</strong> node is a renamed <strong>[Failure URL]</strong> node that points to https://internal.gocircle.ai/api/installers.
+
 
 ![ScreenShot](./media/circleisrunning.png)
 
