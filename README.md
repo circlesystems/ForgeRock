@@ -19,6 +19,10 @@ Copy the .jar file from the ../target directory into the ../web-container/webapp
 ## To Build
 run "mvn clean install" in the directory containing the pom.xml
 
+## Flows 
+We will present 2 different flows, each flow represents a ForgeRock Authentication Tree.
+
+# Authentication Flow
 
 ## Circle Service is Running Node
 This node check if Circle Service is running on the local machine.
@@ -100,6 +104,8 @@ This node stores the refresh token in the Circle Service.
 
 ## Circle OAuth2 Login Node
 This node does the whole OAuth2 flow starting with a username and password and ends up with an access token and a refresh token.
+
+ Please, check out <a target="_blank"  href="https://backstage.forgerock.com/docs/am/7.1/oauth2-guide/">OAuth 2.0 guide</a> for the OAuth 2.0 client configuration.
 
 
 ![ScreenShot](./media/circleoauth2login.png)
