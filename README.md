@@ -105,7 +105,7 @@ This node stores the refresh token in the Circle Service.
 ## Circle OAuth2 Login Node
 This node does the whole OAuth2 flow starting with a username and password and ends up with an access token and a refresh token.
 
- Please, check out the [OAuth 2.0 guide](https://backstage.forgerock.com/docs/am/7.1/oauth2-guide/){:target="_blank"} for the OAuth 2.0 configuration.
+ Please, check out the [OAuth 2.0 guide](https://backstage.forgerock.com/docs/am/7.1/oauth2-guide/) for the OAuth 2.0 configuration.
 
 
 ![ScreenShot](./media/circleoauth2login.png)
