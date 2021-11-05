@@ -23,7 +23,7 @@ run "mvn clean install" in the directory containing the pom.xml
 ## Circle Service is Running Node
 This node check if Circle Service is running on the local machine.
 
-<strong>Note:</strong> the <strong>[Installers URL]</strong> node is a renamed <strong>[Failure URL]</strong> node that points to https://internal.gocircle.ai/api/installers.
+<strong>Note:</strong> the <strong>[Installers URL]</strong> node is a renamed <strong>[Failure URL]</strong> node that points to https://download.gocircle.ai/.
 
 
 ![ScreenShot](./media/circleisrunning.png)
@@ -41,8 +41,8 @@ This node Authorizes the usage of the Circle Service by getting a Token from Cir
 
 
 ### The node provides 2 outcomes
-- authorized   
-- unauthorized
+- Authorized   
+- Unauthorized
 
 
 ### Node settings
@@ -80,7 +80,10 @@ The new tokens are stored into the "transientState" ({refresh_token} and {access
 - **OAuth2 Client Secret** The OAuth 2.0 Client Secret
 - **OAuth2 Access Token Endpoint** The OAuth 2.0 access token endpoint.
 
- 
+ ### The node provides 2 outcomes
+- Refresh Token
+- No Refresh Token 
+
  
 ## Circle Save Token Node
 This node stores the refresh token in the Circle Service.

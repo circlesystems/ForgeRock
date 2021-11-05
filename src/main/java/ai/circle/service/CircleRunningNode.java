@@ -85,8 +85,9 @@ public class CircleRunningNode implements Node {
         @Override
         public List<Outcome> getOutcomes(PreferredLocales locales, JsonValue nodeAttributes) {
             ResourceBundle bundle = locales.getBundleInPreferredLocale(BUNDLE, OutcomeProvider.class.getClassLoader());
-            return ImmutableList.of(new Outcome(TRUE_OUTCOME_ID, bundle.getString(FALSE_OUTCOME_ID)),
-                    new Outcome(TRUE_OUTCOME_ID, bundle.getString(FALSE_OUTCOME_ID)));
+            return ImmutableList.of( //
+                    new Outcome(TRUE_OUTCOME_ID, bundle.getString(TRUE_OUTCOME_ID)),
+                    new Outcome(FALSE_OUTCOME_ID, bundle.getString(FALSE_OUTCOME_ID)));
         }
     }
 }
