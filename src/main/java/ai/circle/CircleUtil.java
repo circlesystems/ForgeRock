@@ -196,6 +196,7 @@ public class CircleUtil {
         try {
             HttpResponse response = client.execute(post);
             String json = EntityUtils.toString(response.getEntity());
+
             JSONObject jret = new JSONObject(json);
             return jret.getString("tokenId");
 

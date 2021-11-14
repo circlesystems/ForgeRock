@@ -159,6 +159,7 @@ public class CircleAuthorizeNode implements Node {
                     + "&nonce=" + rndGen.nextInt();
 
             String signature = Crypto.hmac_sha256(config.secretKey(), apiUrlParam);
+
             URL url = new URL(apiUrl + "?" + apiUrlParam + "&signature=" + signature);
 
             // Build HTTP request

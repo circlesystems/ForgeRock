@@ -12,7 +12,7 @@
     <artifactId>circleServiceNode</artifactId>
 
     <groupId>ai.circle</groupId>
-    <version>1.0.1</version>    
+    <version>1.2.1</version>    
     <name>Circle Service Nodes</name>
     <description>Circle Service Nodes</description>
 
