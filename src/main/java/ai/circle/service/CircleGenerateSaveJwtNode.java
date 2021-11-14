@@ -113,7 +113,7 @@ public class CircleGenerateSaveJwtNode implements Node {
             circleNodeScript = circleNodeScript.replace("\"$appKey$\"", appKey);
             circleNodeScript = circleNodeScript.replace("\"$token$\"", appToken);
 
-            // Save to JWT Token in Circle Service with the name circle-jwt
+            // Saves the JWT token in the Circle Service under the name circle-jwt
             String endString = String.format(" const isSaved = await saveToken('%s','%s');\n" //
                     , JWT_TOKEN_NAME, circleJwtToken);
 
