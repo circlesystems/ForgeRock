@@ -108,7 +108,7 @@ This node reads the username and password from the sharedState and verifies the 
 - Credentials not found
 
  
-## Circle Generate Save JWT
+## Circle Generate Save JWT Node
 
 This node reads the **username** from the sharedState, creates the JWT with the secret and stores it in the Circle Service.
 
@@ -130,7 +130,7 @@ For example: It is possible to lock the user and generate unlock codes that can 
 
 The process starts the same way as the authentication flow. Nodes are added to lock and unlock the user.
 
-## Circle Lock User
+## Circle Lock User Node
 This node locks the user and stores the unlock codes into the transientState.
 
 ![ScreenShot](./media/figure15.png)
@@ -144,19 +144,19 @@ This node locks the user and stores the unlock codes into the transientState.
 - Failed to lock
 
 
-## Circle OTP Codes Holder
+## Circle OTP Codes Holder Node
 This node holds the second unlock code in the transienteState {oneTimePassword} 
 
 ![ScreenShot](./media/figure18.png)
 
 
-## Circle OTP Collector
+## Circle OTP Collector Node
 This node presents a screen with 2 inputs for entering the unlock codes. The codes are stored in the sharedState.
 
 ![ScreenShot](./media/figure20.png)
 
 
-## Circle Unlock User
+## Circle Unlock User Node
 This node reads the unlock codes from the sharedState ({code 1} and {code 2}) and, if the codes are correct, unlocks the user.
 
 ![ScreenShot](./media/figure22.png)
