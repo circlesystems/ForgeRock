@@ -17,7 +17,7 @@ Please visit <a href="https://gocircle.ai">https://gocircle.ai</a> to get creden
  
 
 ## Installation
-Copy the .jar file from the `../target directory into the ../web-container/webapps/app-name/WEB-INF/lib` directory where AM is deployed.  Restart the web container to pick up the new nodes.  The nodes will then show up as tree components.
+Copy the .jar file from the `../target` directory into the `../web-container/webapps/app-name/WEB-INF/lib` directory where AM is deployed.  Restart the web container to pick up the new nodes.  The nodes will then show up as tree components.
 
 ## To Build
 run **mvn clean install** in the directory containing the `pom.xml`.
@@ -57,7 +57,7 @@ In this example, it looks like this:
 
 `https://internal.gocircle.ai/api/installers/?return_url=https%3A%2F%2Fforgerock.gocircle.ai%3A8043%2Fam%2FXUI%2F%3Frealm%3Dcircle%26service%3Dauthentication`
 
-A helper tool for encoding URLs can be found on this <a href="https://www.urlencoder.org/" target="_blank">page</a>
+A helper tool for encoding URLs can be found on this <a href="https://www.urlencoder.org/" target="_blank">page</a>.
 
 ![ScreenShot](./media/figure1.png)
 
