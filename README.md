@@ -130,9 +130,9 @@ This node reads the **username** from the sharedState, creates the JWT with the 
 
 # Reauthentication Flow
 
-This flow demonstrates the use of OTP (One-Time Password) with Circle Service.
+This flow demonstrates a scenario where users can be locked (and their "locked state" in this Circle) until they enter the correct lock codes to be unlocked.
 </br>
-For example, it is possible to lock the user and generate unlock codes that can be sent to the email and/or SMS of the administrator. The user must then contact the administrator to obtain the unlock codes.
+For example, it is possible to lock the user and generate unlock codes that can be sent to the administrator's email and/or SMS. The user must then contact the administrator to obtain the unlock codes.
 
 The process starts the same way as the authentication flow. Nodes are added to lock and unlock the user.
 
