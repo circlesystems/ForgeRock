@@ -73,7 +73,7 @@ This node authorizes the Circle Service by getting a token from the Circle serve
 
 ![ScreenShot](./media/figure2.png)
 
-###The node responds with either:
+### The node responds with either:
 - Authorized   
 - Unauthorized
 
