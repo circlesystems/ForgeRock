@@ -4,9 +4,9 @@
 -->
 
 # Circle Service
-Circle Service allows ultra-secure, client-side, cross-browser storage of objects and files.
+The Circle Service allows ultra-secure, client-side, cross-browser storage of objects and files.
 </br>
-Unlike cookies, which can be copied or modified, objects or files stored inside Circle Service can not be accessed or changed.
+Unlike cookies, which can be copied or modified, objects or files stored inside the Circle Service can not be accessed or changed.
 
 # Circle Nodes Required for ForgeRock
 
