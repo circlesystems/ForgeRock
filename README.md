@@ -32,11 +32,11 @@ The authentication flow performs the following operations:
 
 - Authorizes the Circle Service by retrieving an authorization token from the Circle servers.
 
-- Checks if a JWT (JSON Web Token) is stored inside the Circle Service. If so, it checks if it is valid by checking that the signature is not expired and reads the username stored inside the token and stores it in sharedState for the next node.
+- Checks if a JWT (JSON Web Token) is stored inside the Circle Service. If so, it checks that the signature is not expired. Then it reads the username stored inside the token and stores it in **sharedState** for the next node.
 
 - If the JWT does not exist, it redirects the user to the username and password sign-in flow.
 
-- Once the credentials are valid, it generates a JWT, stores it securely in the Circle Service, and puts the username into **sharedState** for the next node.
+- Once the credentials are validated, it generates a JWT, stores it securely in the Circle Service, and again puts the username into **sharedState** for the next node.
 
 
 ## Circle Service is Running Node
@@ -69,7 +69,7 @@ A helper tool for encoding URLs can be found on this <a href="https://www.urlenc
 
 
 ## Circle Authorize Node
-This node authorizes the Circle Service by getting a token from the Circle servers. The token is added to the sharedState and passed to the **ALL OTHER CIRCLE NODES**.
+This node authorizes the Circle Service by getting a token from the Circle servers. The token is added to the sharedState and passed to the **all other circle nodes**.
 
 ![ScreenShot](./media/figure2.png)
 
@@ -80,7 +80,7 @@ This node authorizes the Circle Service by getting a token from the Circle serve
 ### Node settings
 - **App Key** API key
 - **Secret** API secret
-- **Customer Code** customer code given at signup
+- **Customer Code** customer code assigned at developer signup
 - **API URL** the default Circle API URL
 
  
@@ -130,7 +130,7 @@ This node reads the **username** from the sharedState, creates the JWT with the 
 
 # Reauthentication Flow
 
-This flow demonstrates a scenario where users can be locked (and their "locked state" in this Circle) until they enter the correct lock codes to be unlocked.
+This flow demonstrates a scenario where users can be locked (and their **locked state** in this Circle) until they enter the correct lock codes to be unlocked.
 </br>
 For example, it is possible to lock the user and generate unlock codes that can be sent to the administrator's email and/or SMS. The user must then contact the administrator to obtain the unlock codes.
 
@@ -151,7 +151,7 @@ This node locks the user and stores the unlock codes in the **transientState**.
 
 
 ## Circle OTP Codes Holder Node
-This node holds the second unlock code in the transienteState {oneTimePassword} 
+This node holds the second unlock code in the transient State {oneTimePassword} 
 
 ![ScreenShot](./media/figure18.png)
 
