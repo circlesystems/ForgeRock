@@ -151,7 +151,7 @@ This node locks the user and stores the unlock codes in the **transientState**.
 
 
 ## Circle OTP Codes Holder Node
-This node holds the second unlock code in the transienteState {oneTimePassword} 
+This node holds the second unlock code in the transient State {oneTimePassword} 
 
 ![ScreenShot](./media/figure18.png)
 
