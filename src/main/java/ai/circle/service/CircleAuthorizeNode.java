@@ -20,6 +20,7 @@ import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.forgerock.openam.auth.node.api.NodeState;
 import org.forgerock.openam.auth.node.api.TreeContext;
+import org.forgerock.openam.sm.annotations.adapters.Password;
 import org.forgerock.util.i18n.PreferredLocales;
 
 import org.json.JSONObject;
@@ -56,16 +57,13 @@ public class CircleAuthorizeNode implements Node {
     public interface Config {
 
         @Attribute(order = 10, validators = { RequiredValueValidator.class })
-
         default String appKey() {
             return "";
         }
 
         @Attribute(order = 20, validators = { RequiredValueValidator.class })
-
-        default String secretKey() {
-            return "";
-        }
+        @Password
+        char[] secretKey();
 
         @Attribute(order = 30, validators = { RequiredValueValidator.class })
         default String customerCode() {
@@ -99,7 +97,6 @@ public class CircleAuthorizeNode implements Node {
                 .filter(scriptOutput -> !Strings.isNullOrEmpty(scriptOutput));
 
         // check if there is a result of javascript
-
         if (result.isPresent()) {
             NodeState newNodeState = context.getStateFor(this);
             String resultString = result.get();
@@ -158,7 +155,7 @@ public class CircleAuthorizeNode implements Node {
                     + "&endUserId=userman" //
                     + "&nonce=" + rndGen.nextInt();
 
-            String signature = Crypto.hmac_sha256(config.secretKey(), apiUrlParam);
+            String signature = Crypto.hmac_sha256(String.valueOf(config.secretKey()), apiUrlParam);
 
             URL url = new URL(apiUrl + "?" + apiUrlParam + "&signature=" + signature);
 

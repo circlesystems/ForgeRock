@@ -98,20 +98,6 @@ If the token is valid, the username stored in the token is read and stored in th
 ### The node responds with either:
 - JWT is valid
 - JWT expired or invalid
-
- 
-## Circle Credentials Checker Node
-This node reads the username and password from the **sharedState** and verifies the validity of the username and password using an <a href="https://backstage.forgerock.com/docs/am/7.1/oauth2-guide/oauth2-register-client.html">OAuth 2.0 client</a>.
-
-![ScreenShot](./media/figure5.png)
-
-### Node settings
-- **OAuth2 Access Token Endpoint** the OAuth 2.0 access token endpoint
-
- ### The node responds with either:
-- Credentials found
-- Credentials not found
-
  
 ## Circle Generate Save JWT Node
 
@@ -123,7 +109,7 @@ This node reads the **username** from the sharedState, creates the JWT with the 
 ### Node settings
 - **Secret** The Secret provided by Circle upon registration
 - **Expiry time (days)** The token expiration time in days
-
+fig
 ### The node responds with either:
 - Successfully saved
 - Failed to save

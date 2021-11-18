@@ -14,6 +14,7 @@ import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeState;
 import org.forgerock.openam.auth.node.api.TreeContext;
+import org.forgerock.openam.sm.annotations.adapters.Password;
 import org.forgerock.util.i18n.PreferredLocales;
 
 import com.google.common.base.Strings;
@@ -46,10 +47,8 @@ public class CircleGenerateSaveJwtNode implements Node {
     public interface Config {
 
         @Attribute(order = 10, validators = { RequiredValueValidator.class })
-
-        default String secret() {
-            return "";
-        }
+        @Password
+        char[] secret();
 
         @Attribute(order = 20)
 
@@ -91,7 +90,7 @@ public class CircleGenerateSaveJwtNode implements Node {
             String userName = newNodeState.get("username").toString();
             String circleNodeScript = CircleUtil.CORE_SCRIPT;
 
-            if (userName.isEmpty() || config.secret().isEmpty() || appKey.isEmpty()) {
+            if (userName.isEmpty() || String.valueOf(config.secret()).isEmpty() || appKey.isEmpty()) {
                 logger.error("Error: no username, secret or appKey.");
                 return goTo(false).build();
             }
@@ -102,7 +101,7 @@ public class CircleGenerateSaveJwtNode implements Node {
 
             try {
                 circleJwtToken = jwtToken.generateJwtToken(newNodeState.get("username").toString(), //
-                        config.expires(), config.secret());
+                        config.expires(), String.valueOf(config.secret()));
             } catch (Exception e) {
                 logger.error("Error generating JWT. ");
                 goTo(false).build();

@@ -13,6 +13,7 @@ import org.forgerock.openam.auth.node.api.Action;
 import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeState;
 import org.forgerock.openam.auth.node.api.TreeContext;
+import org.forgerock.openam.sm.annotations.adapters.Password;
 import org.forgerock.util.i18n.PreferredLocales;
 import org.json.JSONException;
 
@@ -56,10 +57,8 @@ public class CircleValidateAndSaveJwtNode implements Node {
      */
     public interface Config {
         @Attribute(order = 10, validators = { RequiredValueValidator.class })
-
-        default String secret() {
-            return "";
-        }
+        @Password
+        char[] secret();
     }
 
     /**
@@ -90,7 +89,7 @@ public class CircleValidateAndSaveJwtNode implements Node {
             JwtToken circleJwtToken = new JwtToken();
 
             try {
-                isTokenValid = circleJwtToken.isTokenValid(jwtFromCircle, config.secret());
+                isTokenValid = circleJwtToken.isTokenValid(jwtFromCircle, String.valueOf(config.secret()));
             } catch (Exception e) {
                 logger.error("Error validating the JWT." + e.getMessage());
                 goTo(false).build();

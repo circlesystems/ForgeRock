@@ -25,7 +25,7 @@ public class CircleAuthTreeNodesPlugin extends AbstractNodeAmPlugin {
 
     @Override
     public String getPluginVersion() {
-        return "1.2.1";
+        return "1.2.2";
     }
 
     @Override
@@ -33,6 +33,20 @@ public class CircleAuthTreeNodesPlugin extends AbstractNodeAmPlugin {
         for (Class<? extends Node> nodeClass : getNodes()) {
             pluginTools.startAuthNode(nodeClass);
         }
+    }
+
+    @Override
+    public void upgrade(String fromVersion) throws PluginException {
+        pluginTools.upgradeAuthNode(CircleAuthorizeNode.class);
+        pluginTools.upgradeAuthNode(CircleGenerateSaveJwtNode.class);
+        pluginTools.upgradeAuthNode(CircleLockUserNode.class);
+        pluginTools.upgradeAuthNode(CircleValidateAndSaveJwtNode.class);
+        pluginTools.upgradeAuthNode(CircleCheckCredentialsNode.class);
+        pluginTools.upgradeAuthNode(CircleOTPCodesNode.class);
+        pluginTools.upgradeAuthNode(CircleOTPCollectorNode.class);
+        pluginTools.upgradeAuthNode(CircleRunningNode.class);
+        pluginTools.upgradeAuthNode(CircleValidateAndSaveJwtNode.class);
+
     }
 
     @Override
