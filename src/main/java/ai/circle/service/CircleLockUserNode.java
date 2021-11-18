@@ -18,6 +18,7 @@ import org.forgerock.openam.auth.node.api.Node;
 import org.forgerock.openam.auth.node.api.NodeProcessException;
 import org.forgerock.openam.auth.node.api.NodeState;
 import org.forgerock.openam.auth.node.api.TreeContext;
+import org.forgerock.openam.sm.annotations.adapters.Password;
 import org.forgerock.util.i18n.PreferredLocales;
 import static org.forgerock.openam.auth.node.api.Action.send;
 
@@ -55,11 +56,9 @@ public class CircleLockUserNode implements Node {
      * Configuration for the node.
      */
     public interface Config {
-        @Attribute(order = 10, validators = { RequiredValueValidator.class })
-
-        default String privateKey() {
-            return "";
-        }
+        @Attribute(order = 10, validators = {RequiredValueValidator.class})
+        @Password
+        char[] privateKey();
     }
 
     private final Config config;
@@ -87,7 +86,7 @@ public class CircleLockUserNode implements Node {
 
         if (result.isPresent()) {
             String resultString = result.get();
-            String privateKey = config.privateKey();
+            String privateKey = String.valueOf(config.privateKey());
 
             if (!resultString.isEmpty()) {
 
