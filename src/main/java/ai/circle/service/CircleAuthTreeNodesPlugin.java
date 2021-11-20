@@ -41,7 +41,6 @@ public class CircleAuthTreeNodesPlugin extends AbstractNodeAmPlugin {
         pluginTools.upgradeAuthNode(CircleGenerateSaveJwtNode.class);
         pluginTools.upgradeAuthNode(CircleLockUserNode.class);
         pluginTools.upgradeAuthNode(CircleValidateAndSaveJwtNode.class);
-        pluginTools.upgradeAuthNode(CircleCheckCredentialsNode.class);
         pluginTools.upgradeAuthNode(CircleOTPCodesNode.class);
         pluginTools.upgradeAuthNode(CircleOTPCollectorNode.class);
         pluginTools.upgradeAuthNode(CircleRunningNode.class);
@@ -55,7 +54,6 @@ public class CircleAuthTreeNodesPlugin extends AbstractNodeAmPlugin {
                 CircleLockUserNode.class, //
                 CircleOTPCodesNode.class, //
                 CircleOTPCollectorNode.class, //
-                CircleCheckCredentialsNode.class, //
                 CircleRunningNode.class, //
                 CircleUnlockUserNode.class, //
                 CircleGenerateSaveJwtNode.class, //
