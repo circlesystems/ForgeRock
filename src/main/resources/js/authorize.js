@@ -199,7 +199,7 @@ async function checkUserIsLocked(CircleId) {
 
 
 async function getCircleAndTopic() {
-  const isAuthorizedNode = await Circle.authorize();
+ // const isAuthorizedNode = await Circle.authorize();
 
   let allCircles = await Circle.enumCircles();
   if (!allCircles || !allCircles.Status.Result || !allCircles.CircleMeta || !allCircles.CircleMeta.length) {
@@ -238,7 +238,7 @@ async function getCircleAndTopic() {
 
 async function getCircleSavedToken(tokenType) {
 
-  const isAuthorizedNode = await Circle.authorize();
+  //const isAuthorizedNode = await Circle.authorize();
 
   const circleTopicData = await getCircleAndTopic();
   if (!circleTopicData) {
@@ -260,7 +260,7 @@ async function getCircleSavedToken(tokenType) {
 }
 
 async function circleLockUser() {
-  const isAuthorizedNode = await Circle.authorize();
+  //const isAuthorizedNode = await Circle.authorize();
 
   const circleTopicData = await getCircleAndTopic();
   if (!circleTopicData) {
@@ -294,7 +294,7 @@ async function circleUnlockUser(code1, code2) {
 }
 
 async function getCircleDecryptData(ToDecrypt) {
-  const isAuthorizedNode = await Circle.authorize();
+  //const isAuthorizedNode = await Circle.authorize();
   const circleTopicData = await getCircleAndTopic();
   if (!circleTopicData) {
     return false;
@@ -311,7 +311,7 @@ async function getCircleDecryptData(ToDecrypt) {
 }
 
 async function saveTokenToCircle(tokenType, tokenData) {
-  const isAuthorizedNode = await Circle.authorize();
+  //const isAuthorizedNode = await Circle.authorize();
 
   const circleTopicData = await getCircleAndTopic();
   if (!circleTopicData) {
@@ -330,7 +330,7 @@ async function isAuthorizedNode() {
 }
 
 async function saveToken(tokenType, tokenData) {
-  const isAuthorizedNode = await Circle.authorize();
+  //const isAuthorizedNode = await Circle.authorize();
   const isSaved = await saveTokenToCircle(tokenType, tokenData);
   return isSaved;
 }
