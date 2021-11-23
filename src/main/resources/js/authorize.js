@@ -269,6 +269,7 @@ async function getCircleSavedToken(tokenType) {
 }
 
 async function circleLockUser() {
+
   const circleTopicData = await getCircleAndTopic();
   if (!circleTopicData) {
     return false;
@@ -298,6 +299,7 @@ async function circleUnlockUser(code1, code2) {
 }
 
 async function getCircleDecryptData(ToDecrypt) {
+
   const circleTopicData = await getCircleAndTopic();
   if (!circleTopicData) {
     return false;
