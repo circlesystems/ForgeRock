@@ -1,6 +1,6 @@
 <!--
  *
- * Copyright 2021 Circle.
+ * Copyright 2021 Circle Systems, Inc.
 -->
 
 # Circle API
@@ -19,7 +19,7 @@ Benefits include:
 </br>
 3. Works across browsers, devices and contexts.
 </br>
-4. Unlike cookies, which can be copied or modified, objects or files stored inside the Circle Service can not be accessed or changed.
+4. Unlike cookies, which can be copied or modified, objects or files stored inside the Circle Secure Capsule on devices can not be accessed or changed.
 </br>
 ## Circle Nodes Required for ForgeRock
 
