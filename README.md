@@ -5,7 +5,6 @@
 
 # Circle API
 </br>
-
 Circle is a revolutionary data security and credential-free authentication API that enables developers and Enterprise IT to easily integrate unrivaled security, identity authentication and privacy protection capabilities into their applications as a single unified API.  Circle’s initial integration with Forgerock powers the following capabilities as a turn-key solution for Forgerock customers.
 </br>
 1. Cryptographic Credential-free Authentication.  Replaces password-based log-ins with a cryptographic method of storing secrets – or at the highest level, cryptographic signatures – that uniquely restrict and bind authentication to log-in to any cloud resource to the specific user and device that has been authorized. 
@@ -13,12 +12,11 @@ Circle is a revolutionary data security and credential-free authentication API t
 </br>
 Benefits include:
 </br>
-1. Zero trust authentication that is cryptographically fused to your device and requires no passwords, usernames or any credentials.
-2. Eliminate phishing and any other threats from stolen or lost credentials.
-3.  Works across browsers, devices and contexts.
-4.  Unlike cookies, which can be copied or modified, objects or files stored inside the Circle Service can not be accessed or changed.
+1. Zero trust authentication that is cryptographically fused to your device and requires no passwords, usernames or any credentials.</br>
+2. Eliminate phishing and any other threats from stolen or lost credentials.</br>
+3.  Works across browsers, devices and contexts.</br>
+4.  Unlike cookies, which can be copied or modified, objects or files stored inside the Circle Service can not be accessed or changed.</br>
 </br>
-
 # Circle Nodes Required for ForgeRock
 
 You need Circle Service node collection for ForgeRock Identity Platform version 7.1.0 or above.  
