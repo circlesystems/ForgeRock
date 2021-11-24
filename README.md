@@ -8,6 +8,7 @@
 Circle is a revolutionary data security and credential-free authentication API that enables developers and Enterprise IT to easily integrate unrivaled security, identity authentication and privacy protection capabilities into their applications as a single unified API.  Circle’s initial integration with Forgerock powers the following capabilities as a turn-key solution for Forgerock customers.
 </br>
 1. Cryptographic Credential-free Authentication.  Replaces password-based log-ins with a cryptographic method of storing secrets – or at the highest level, cryptographic signatures – that uniquely restrict and bind authentication to log-in to any cloud resource to the specific user and device that has been authorized. 
+</br>
 2. Circle of Trust Human-in-the-Loop Identity Verification + Authentication.    Provides the option to escalate to ultra-secure distributed, peer-to-peer multifactor identity verification + authentication when needed for high risk use cases, contexts and user profiles.  
 </br>
 Benefits include:
