@@ -21,6 +21,7 @@ Benefits include:
 </br>
 4. Unlike cookies, which can be copied or modified, objects or files stored inside the Circle Secure Capsule on devices can not be accessed or changed.
 </br>
+
 ## Circle Nodes Required for ForgeRock
 
 You need Circle Service node collection for ForgeRock Identity Platform version 7.1.0 or above.  
