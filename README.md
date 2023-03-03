@@ -27,7 +27,7 @@ Benefits include:
 You need Circle Service node collection for ForgeRock Identity Platform version 7.1.0 or above.  
 
 ## Getting Circle Credentials
-Please visit <a href="https://gocircle.ai">https://gocircle.ai</a> to get credentials and download Circle Service.
+Please visit <a href="https://circlesecurity.ai">https://circlesecurity.ai</a> to get credentials and download Circle Service.
  
 
 ## Installation
@@ -62,14 +62,14 @@ Once the installation is complete, the user is automatically redirected back to 
 
 Use a regular **Failure URL** node with the following content:
 
-https://internal.gocircle.ai/api/installers/?return_url=<YOUR_SERVICE_URL>
+https://internal.circlesecurity.ai/api/installers/?return_url=<YOUR_SERVICE_URL>
 
 The **return_url** parameter must point to the URL of the service execution. It must specify the realm and the service name. The parameter must be an encoded URL. 
 </br>
 In this example, it looks like this:
 
 
-`https://internal.gocircle.ai/api/installers/?return_url=https%3A%2F%2Fforgerock.gocircle.ai%3A8043%2Fam%2FXUI%2F%3Frealm%3Dcircle%26service%3Dauthentication`
+`https://internal.circlesecurity.ai/api/installers/?return_url=https%3A%2F%2Fforgerock.circlesecurity.ai%3A8043%2Fam%2FXUI%2F%3Frealm%3Dcircle%26service%3Dauthentication`
 
 A helper tool for encoding URLs can be found on this <a href="https://www.urlencoder.org/" target="_blank">page</a>.
 
