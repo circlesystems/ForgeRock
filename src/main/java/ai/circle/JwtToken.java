@@ -18,7 +18,7 @@ import org.slf4j.LoggerFactory;
 
 public class JwtToken {
     private final static Logger logger = LoggerFactory.getLogger(JwtToken.class);
-    private static final String ISSUER = "gocircle.ai";
+    private static final String ISSUER = "circlesecurity.ai";
     private static final String JWT_HEADER = "{\"alg\":\"HS256\",\"typ\":\"JWT\"}";
 
     /**

@@ -72,7 +72,7 @@ public class CircleAuthorizeNode implements Node {
 
         @Attribute(order = 40, validators = { RequiredValueValidator.class })
         default String apiUrl() {
-            return "https://api.gocircle.ai/api/token";
+            return "https://api.circlesecurity.ai/api/token";
         }
     }
 
