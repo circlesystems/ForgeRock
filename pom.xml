@@ -2,6 +2,7 @@
 <!--
  *
  * Copyright 2021 Circle
+ * Portion Copyright ForgeRock 2023 - Bruno Lavit
  * 
 -->
 
@@ -84,7 +85,7 @@
             </snapshots>
             <id>forgerock-private-releases</id>
             <name>ForgeRock Private Release Repository</name>
-            <url>https://maven.forgerock.org/repo/private-releases</url>
+            <url>https://maven.forgerock.org/artifactory/private-releases</url>
         </repository>
     </repositories>
 
